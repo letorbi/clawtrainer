@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+
+    <title>Hangboard trainer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 1ex;
+            font-family: sans-serif;
+        }
+        
+        h1 {
+            margin: 0;
+            padding: 0.5em 0;
+            display: block;
+            background-color: #9bcdff;
+            text-align: center;
+            font-size: 2em;
+            font-weight: normal;
+        }
+        
+        div#counter {
+            font-size: 3em;
+            color: blue;
+        }
+        
+        progress {
+            width: 50%;
+            height: 3em;
+            margin: 1em 0;
+            -webkit-appearance: none;
+        }
+        
+        progress#pause_pbar {
+            width: 100%;
+        }
+        
+        ::-webkit-progress-bar {
+            background-color: transparent;
+            border: 1px solid #cccccc;
+        }
+        
+        #hold_pbar::-webkit-progress-value {
+            background-color: red;
+        }
+        #break_pbar::-webkit-progress-value {
+            background-color: green;
+        }
+        #pause_pbar::-webkit-progress-value {
+            background-color: blue;
+        }
+        
+        .board_outer_container {
+            padding: 1ex;
+        }
+        .board_inner_container {
+            position: relative;
+        }
+        #board_img {
+            width: 100%;
+        }
+        img.overlay_img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.4;
+            width: 100%;
+        }
+        
+        button {
+            height: 3em;
+            width: 100%
+        }
+    </style>
+  </head>
+
+  <body>
+    <h1>Hangboard Trainer</h1>
+    <div class="board_outer_container">
+        <div class="board_inner_container">
+            <img id="board_img" src="images/bm1000.png" alt=""/>
+            <img id="overlay_left" class="overlay_img" src="" alt=""/>
+            <img id="overlay_right" class="overlay_img" src="" alt=""/>
+        </div>
+    </div>
+    <div id="set_title"></div>
+    <div id="set_description"></div>
+    <div id="counter">&nbsp;</div>
+    <progress id="hold_pbar" max="7" value="0"></progress><progress id="break_pbar" max="3" value="0"></progress>
+    <progress id="pause_pbar" max="7" value="0"></progress>
+    <button name="pause">Pause</button>
+    <script src="basic_training.js"></script>
+    <script src="trainer.js"></script>
+  </body>
+</html>
