@@ -87,7 +87,7 @@ async function runTraining(board, training) {
         }
 
         var utter_set_desc = new SpeechSynthesisUtterance();
-        utter_set_desc.text = `Next exercise: ${set.description} for ${set.hold} seconds. Left hand ${board.holds[set.left].name}. Right hand ${board.holds[set.right].name}. Repeat ${set.reps} ${((set.reps > 1) ? "times" : "time")}.`;
+        utter_set_desc.text = `Next exercise: ${set.description} for ${set.hold} seconds. Left hand ${board.left_holds[set.left].name}. Right hand ${board.right_holds[set.right].name}. Repeat ${set.reps} ${((set.reps > 1) ? "times" : "time")}.`;
         utter_set_desc.lang = 'en-US';
 
         if (i > 0) { // Vor dem ersten Satz keine Ansage der Pause
@@ -131,8 +131,8 @@ async function runTraining(board, training) {
                     set_title_div.textContent = set.title;
                     set_description_div.textContent = set.description;
                     
-                    document.querySelector("#run_content .overlay_left").src = "images/" + board.holds[set.left].image;
-                    document.querySelector("#run_content .overlay_right").src = "images/" + board.holds[set.right].image;
+                    document.querySelector("#run_content .overlay_left").src = "images/" + board.left_holds[set.left].image;
+                    document.querySelector("#run_content .overlay_right").src = "images/" + board.right_holds[set.right].image;
                 }
                 if (step > 0 && ((set.pause - step) % 30 == 0)) {
                     var utter_pause = new SpeechSynthesisUtterance();
@@ -237,6 +237,159 @@ async function runTraining(board, training) {
     }
 }
 
+function updateTraining(event) {
+    trainings[this.dataset.training][this.dataset.field] = this.value;
+    console.log(`Setting training[${this.dataset.training}].${this.dataset.field} = "${this.value}".`);
+}
+
+function showTrainingEdit(training_num) {
+    var board_num = 0;
+    var training = trainings[training_num];
+
+    var edit_content = document.getElementById('edit_content');
+    var form = document.getElementById('training_edit');
+    if (form) {
+        edit_content.removeChild(form);
+    }
+
+    const template_edit = document.getElementById('template_edit');
+    
+    let fragment = template_edit.content.cloneNode(true);
+    let title = fragment.getElementById('edit_training_title');
+    title.value = training.title;
+    title.addEventListener('change', function() {
+        trainings[training_num].title = this.value;
+        console.log(`Setting trainings[${training_num}].title = "${this.value}".`);
+    });
+
+    let description = fragment.getElementById('edit_training_description');
+    description.value = training.description;
+    description.addEventListener('change', function() {
+        trainings[training_num].description = this.value;
+        console.log(`Setting trainings[${training_num}].description = "${this.value}".`);
+    });
+
+    edit_content.appendChild(fragment);
+    
+    form = document.getElementById('training_edit');
+    
+    const template_edit_set = document.getElementById('template_edit_set');
+        
+    for (let set_num in training.sets) {
+        let set = training.sets[set_num];
+        
+        let fragment = template_edit_set.content.cloneNode(true);
+        fragment.querySelectorAll('label').forEach(function(label) {
+            label.htmlFor += "_" + set_num;
+        });
+        
+        let number = fragment.querySelector('.edit_set_number');
+        number.innerHTML = 1 + Number(set_num);
+        
+        let pause = fragment.getElementById('edit_set_pause');
+        pause.value = set.pause;
+        pause.id += "_" + set_num;
+        pause.addEventListener('change', function() {
+            if (this.value < 15) {
+                this.value = 15;
+            }
+            trainings[training_num].sets[set_num].pause = Number(this.value);
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].pause = ${this.value}.`);
+        });
+        
+        let title = fragment.getElementById('edit_set_title');
+        title.value = set.title;
+        title.id += "_" + set_num;
+        title.addEventListener('change', function() {
+            trainings[training_num].sets[set_num].title = this.value;
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].title = "${this.value}".`);
+        });
+
+        let description = fragment.getElementById('edit_set_description');
+        description.value = set.description;
+        description.id += "_" + set_num;
+        description.addEventListener('change', function() {
+            trainings[training_num].sets[set_num].description = this.value;
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].description = "${this.value}".`);
+        });
+
+        let img_board = fragment.querySelector('img.board_img');
+        let img_left = fragment.querySelector('img.overlay_left');
+        let img_right = fragment.querySelector('img.overlay_right');
+        
+        img_board.src = "images/" + boards[board_num].image;
+
+        let left = fragment.getElementById('edit_set_left');
+        left.id += "_" + set_num;
+        for (let hold_id in boards[board_num].left_holds) {
+            let opt = document.createElement('option');
+            opt.setAttribute('value', hold_id);
+            let content = document.createTextNode(boards[board_num].left_holds[hold_id].name);
+            opt.appendChild(content);
+            left.appendChild(opt);
+        }
+        left.value = set.left;
+        img_left.src = "images/" + boards[board_num].left_holds[set.left].image;
+        left.addEventListener('change', function() {
+            trainings[training_num].sets[set_num].left = this.value;
+            img_left.src = "images/" + boards[board_num].left_holds[this.value].image;
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].left = ${this.value} (${this.item(this.selectedIndex).text}).`);
+        });
+
+        let right = fragment.getElementById('edit_set_right');
+        right.id += "_" + set_num;
+        for (let hold_id in boards[board_num].right_holds) {
+            let opt = document.createElement('option');
+            opt.setAttribute('value', hold_id);
+            let content = document.createTextNode(boards[board_num].right_holds[hold_id].name);
+            opt.appendChild(content);
+            right.appendChild(opt);
+        }
+        right.value = set.right;
+        img_right.src = "images/" + boards[board_num].right_holds[set.right].image;
+        right.addEventListener('change', function() {
+            trainings[training_num].sets[set_num].right = this.value;
+            img_right.src = "images/" + boards[board_num].right_holds[this.value].image;
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].right = ${this.value} (${this.item(this.selectedIndex).text}).`);
+        });
+
+        let hold = fragment.getElementById('edit_set_hold');
+        hold.value = set.hold;
+        hold.id += "_" + set_num;
+        hold.addEventListener('change', function() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            trainings[training_num].sets[set_num].hold = Number(this.value);
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].hold = ${this.value}.`);
+        });
+        
+        let interr = fragment.getElementById('edit_set_break');
+        interr.value = set.break;
+        interr.id += "_" + set_num;
+        interr.addEventListener('change', function() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            trainings[training_num].sets[set_num].break = Number(this.value);
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].break = ${this.value}.`);
+        });
+        
+        let reps = fragment.getElementById('edit_set_reps');
+        reps.value = set.reps;
+        reps.id += "_" + set_num;
+        reps.addEventListener('change', function() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            trainings[training_num].sets[set_num].reps = Number(this.value);
+            console.log(`Setting trainings[${training_num}].sets[${set_num}].reps = ${this.value}.`);
+        });
+        
+        form.appendChild(fragment);
+    }
+}
+
 function showMenu() {
     document.getElementById("menu_content").style.display = "block";
     document.getElementById("run_content").style.display = "none";
@@ -335,8 +488,8 @@ function initOnce() {
             var outer = addElement(div, 'div', null, {'class': 'board_small_container'});
 
             addElement(outer, 'img', null, {'class': 'board_img', 'src': "images/" + board.image, 'alt': ""});
-            addElement(outer, 'img', null, {'class': 'overlay_img overlay_left', 'src': "images/" + board.holds[set.left].image, 'alt': ""});
-            addElement(outer, 'img', null, {'class': 'overlay_img overlay_right', 'src': "images/" + board.holds[set.right].image, 'alt': ""});
+            addElement(outer, 'img', null, {'class': 'overlay_img overlay_left', 'src': "images/" + board.left_holds[set.left].image, 'alt': ""});
+            addElement(outer, 'img', null, {'class': 'overlay_img overlay_right', 'src': "images/" + board.right_holds[set.right].image, 'alt': ""});
 
             addElement(div, 'p', set.description.replace(/([^.])$/, '$1.'), {'class': 'set_description'});
             addElement(div, 'p', `Hold for ${set.hold} seconds. Interrupt for ${set.break} seconds. Repeat ${set.reps} times.`, {'class': 'set_details'});
@@ -368,4 +521,5 @@ function initOnce() {
 }
 
 initOnce();
-showMenu();
+//showMenu();
+showTrainingEdit(0);
