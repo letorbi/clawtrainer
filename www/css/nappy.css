@@ -1,3 +1,48 @@
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(MaterialIcons-Regular.woff2) format('woff2'),
+    url(MaterialIcons-Regular.woff) format('woff'),
+    url(MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: sub;
+  float: left;
+  margin-right: -1em;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
 body {
     margin: 0;
   /*  padding: 8px;*/
@@ -6,8 +51,12 @@ body {
 
 h1#logo {
     margin: 0;
-    padding: 0.3em 0 0.4em;
-    display: block;
+    padding: 10px 0 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
     background-color: #9bcdff;
     background-image: url(../images/daniellogo.png);
     background-image: url(../images/daniellogo.png), linear-gradient(to bottom, #afd7ff 0%,#9bcdff 50%,#82c0ff 100%);
@@ -15,7 +64,7 @@ h1#logo {
     background-position: center right;
     border-radius: 0px;
     text-align: center;
-    font-size: 2.5em;
+    font-size: 40px;
     font-weight: bold;
 }
 
@@ -56,6 +105,7 @@ span#set_counter {
     width: 25%;
     display: inline-block;
     vertical-align: middle;
+    font-size: 2em;
 }
 
 span#time_counter {
@@ -70,6 +120,7 @@ span#repeat_counter {
     display: inline-block;
     vertical-align: middle;
     width: 25%;
+    font-size: 2em;
 }
 
 progress {
@@ -160,6 +211,10 @@ button {
     font-size: 1em;
 }
 
+#content {
+    padding: 70px 0 0 0;
+}
+
 #menu_content {
     display: none;
 }
@@ -172,6 +227,11 @@ button {
     display: block;
 }
 
+textarea {
+    resize: vertical;
+    font-family: sans-serif;
+}
+
 select.big_select {
     width: 100%;
     padding: 1em 0.5em;
@@ -180,11 +240,6 @@ select.big_select {
     border-radius: 0px;
     background-color: #d9ecff;
     font-size: 1em;
-}
-
-textarea {
-    resize: vertical;
-    font-family: sans-serif;
 }
 
 input[type='number'] {
