@@ -21,7 +21,7 @@
                     <button class="button_flat" name="delete">Delete</button>
                 </div>
                 <div id="training_details_sets"></div>
-                <button class="button_round" name="start"><i class="material-icons md-light md-24">play_arrow</i></button>
+                <button class="button_round" name="start"><i class="material-icons md-light md-36">play_arrow</i></button>
                 <button class="button_round" name="edit"><i class="material-icons md-light">mode_edit</i></button>
             </div>
             <div id="run_content">
@@ -102,17 +102,17 @@
             </div>
         </div>
         <div id="drawer" class="touch-menu-la">
-            <div class="inner-header">
-                Touch Menu <span>Like Android</span>
+            <header class="drawer-header"><div class="drawer-header-content"></div></header>
+            <div class="menu-items">
+                <a id="a_change_board" href="#"><i class="material-icons md-dark">fitness_center</i>Change board</a>
+                <hr/>
+                <a id="a_export_trainings" href="#" href="#"><i class="material-icons md-dark">file_download</i>Export trainings</a>
+                <a id="a_import_trainings" href="#" href="#"><i class="material-icons md-dark">file_upload</i>Import trainings</a>
+                <a id="a_restore_trainings" href="#" href="#"><i class="material-icons md-dark">restore</i>Restore default trainings</a>
+                <hr/>
+                <a id="a_info" href="#" href="#"><i class="material-icons md-dark">info</i>About</a>
             </div>
-            <ul class="menu-items">
-                <li>Hi</li>
-                <li>Du</li>
-            </ul>
-            <div class="inner-footer">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla non erat ac leo ultrices blandit sed vel risus. Pellentesque facilisis blandit auctor. Maecenas vestibulum vulputate tincidunt. Mauris nec quam libero. Fusce eget ligula non leo varius condimentum quis ac elit.
-            </div>
-            <div class="inner-footer">swkejjhd</div>
+            <input type="file" id="fileElem" multiple accept="application/json" style="display:none" onchange="uploadTrainings(this.files)">
         </div>
 
         <script src="js/boards.js"></script>
