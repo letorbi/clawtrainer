@@ -1,5 +1,3 @@
-// phonegap prepare browser & pscp -l schroeer -i "C:\Users\Daniel Schröer\svncode\Gipfelkreuz\private_key.ppk" -r platforms\browser\www\* daimlerstr.de:stella/www/trainer/
-
 "use strict";
 
 var DEFAULT_SETTINGS = {
@@ -291,7 +289,13 @@ async function runProgram(board, program) {
     }
     speak("Congratulations!");
     console.log("Program completed");
-   
+    navigator.notification.alert(
+        `You have completed program ${program.title}!`,
+        null,
+        'Congratulations',
+        'OK'
+    );
+
     async function runExercise(exercise) {
         const utter_go = new SpeechSynthesisUtterance();
         utter_go.text = "Go!";
