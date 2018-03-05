@@ -1,12 +1,17 @@
 "use strict";
 
 var DEFAULT_SETTINGS = {
-    'version': 3,
+    'version': 4,
     'selectedBoardID': "bm1000",
-    'showDefaultPrograms': true
+    'showDefaultPrograms': true,
+    'speechOutput': true,
+    'soundOutput': true,
+    'voice':    undefined
 };
 
 var SETTINGS, CUSTOM_PROGRAMS = {};
+
+var VOICES = [];
 
 const COUNTER = (function () {
     var count, timer, paused, resolve, reject, steps, interval, cb;
@@ -48,32 +53,47 @@ const COUNTER = (function () {
                 window.clearInterval(timer);
                 paused = true;
             }
+        },
+        finish: function finish() {
+            cb(steps - 1);
+            window.clearInterval(timer);
+            resolve();
         }
     }
 })();
 
 function ticSound() {
-    soundEffect(
-        400,        //frequency
-        0.02,       //attack
-        0.02,       //decay
-        "sine",     //waveform
-        10,         //volume
-        0,          //pan
-        0,          //wait before playing
-        1,          //pitch bend amount
-        false,      //reverse
-        0,          //random pitch range
-        0,          //dissonance
-        undefined,  //echo: [delay, feedback, filter]
-        undefined   //reverb: [duration, decay, reverse?]
-    );
+    if (SETTINGS['soundOutput']) {
+        soundEffect(
+            400,        //frequency
+            0.02,       //attack
+            0.02,       //decay
+            "sine",     //waveform
+            10,         //volume
+            0,          //pan
+            0,          //wait before playing
+            1,          //pitch bend amount
+            false,      //reverse
+            0,          //random pitch range
+            0,          //dissonance
+            undefined,  //echo: [delay, feedback, filter]
+            undefined   //reverb: [duration, decay, reverse?]
+        );
+    }
+}
+
+function goSound() {
+    if (SETTINGS['soundOutput']) {
+        soundEffect(300,0.01,0.1,"triangle",20,0,0,0,false,0,0,undefined,[0.7, 0.1, false]);
+    }
 }
 
 function completedSound() {
-    soundEffect( 587.33, 0, 0.2, "square", 1, 0, 0);    //D
-    soundEffect( 880   , 0, 0.2, "square", 1, 0, 0.1);  //A
-    soundEffect(1174.66, 0, 0.3, "square", 1, 0, 0.2);  //High D
+    if (SETTINGS['soundOutput']) {
+        soundEffect( 587.33, 0, 0.2, "square", 1, 0, 0);    //D
+        soundEffect( 880   , 0, 0.2, "square", 1, 0, 0.1);  //A
+        soundEffect(1174.66, 0, 0.3, "square", 1, 0, 0.2);  //High D
+    }
 }
 
 function downloadPrograms() {
@@ -192,13 +212,18 @@ function storeProgramsAndSettings() {
 
 function loadProgramsAndSettings() {
     if (window.localStorage.getItem('settings')) {
-        SETTINGS = JSON.parse(window.localStorage.getItem('settings'));
+        let loaded_settings = JSON.parse(window.localStorage.getItem('settings'));
+        SETTINGS = DEFAULT_SETTINGS;
+        for (let prop in DEFAULT_SETTINGS) {
+            if ((prop != 'version') &&  (loaded_settings.hasOwnProperty(prop))) {
+                SETTINGS[prop] = loaded_settings[prop];
+            }
+        }
         if (SETTINGS.version == DEFAULT_SETTINGS.version) {
             console.log('Restored settings from storage.');
         }
         else {
-            SETTINGS = DEFAULT_SETTINGS;
-            console.log('Stored settings outdated. Using defaults.');
+            console.log('Stored settings outdated. Partially restored.');
         }
     }
     else {
@@ -219,6 +244,27 @@ function loadProgramsAndSettings() {
     else {
         CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
         console.log('No stored custom programs found.');
+    }
+}
+
+function speak(message) {
+    if (SETTINGS['speechOutput']) {
+        let selected_voice;
+        for (let i in VOICES) {
+            if (VOICES[i].voiceURI === SETTINGS.voice) {
+                selected_voice = VOICES[i];
+                break;
+            }
+        }
+        const utterance = new SpeechSynthesisUtterance();
+        utterance.text = message;
+        utterance.lang = 'en-US';
+        utterance.voice = selected_voice;
+        console.log(`Speaking "${message}"`);
+        speechSynthesis.speak(utterance);
+    }
+    else {
+        console.log(`Not speaking "${message}"`);
     }
 }
 
@@ -263,7 +309,7 @@ async function runProgram(board, program) {
         await COUNTER.start(
             exercise.pause,
             1000,
-            async function pauseCountdownStep(step) {
+            function pauseCountdownStep(step) {
                 time_counter.textContent = exercise.pause - step;
                 pause_pbar.value = step + 1;
                 
@@ -280,7 +326,7 @@ async function runProgram(board, program) {
                     speak(makePauseString(exercise.pause - step, true));
                 }
                 if (exercise.pause - step <= 5) { // letzte fünf Sekunden der Pause ticken
-                    await ticSound();
+                    ticSound();
                 }
             }
         );
@@ -297,10 +343,6 @@ async function runProgram(board, program) {
     );
 
     async function runExercise(exercise) {
-        const utter_go = new SpeechSynthesisUtterance();
-        utter_go.text = "Go!";
-        utter_go.lang = 'en-US';
-
         pause_pbar.style.display = "none";
         hold_pbar.style.display = "inline-block";
         rest_pbar.style.display = "inline-block";
@@ -321,16 +363,19 @@ async function runProgram(board, program) {
             document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
             
             console.log(`rep ${rep+1}: hold`);
-            speechSynthesis.speak(utter_go);
+            if (!SETTINGS.speechOutput) {
+                goSound();
+            }
+            speak("Go!");
             await COUNTER.start(
                 exercise.hold,
                 1000,
-                function hangCountdownStep(step) {
+                function holdCountdownStep(step) {
                     time_counter.textContent = exercise.hold - step;
                     hold_pbar.value = step + 1;
                 }
             );
-            await completedSound();
+            completedSound();
 
             console.log(`rep ${rep+1}: rest`);
             
@@ -338,12 +383,12 @@ async function runProgram(board, program) {
                 await COUNTER.start(
                     exercise.rest,
                     1000,
-                    async function restCountdownStep(step) {
+                    function restCountdownStep(step) {
                         time_counter.textContent = exercise.rest - step;
                         rest_pbar.value = step + 1;
 
                         if (exercise.rest - step <= 3) {
-                            await ticSound();
+                            ticSound();
                         }
                     }
                 );
@@ -352,14 +397,6 @@ async function runProgram(board, program) {
         console.log("exercise complete");
     }
     
-    function speak(message) {
-        const utterance = new SpeechSynthesisUtterance();
-        utterance.text = message;
-        utterance.lang = 'en-US';
-        console.log(`Speaking "${message}"`);
-        speechSynthesis.speak(utterance);
-    }
-
     function makePauseString(pause, short = false) {
         const minutes = Math.floor(pause / 60);
         const seconds = pause % 60;
@@ -394,6 +431,82 @@ function getProgram(identifier) {
     return program;
 }
 
+function updateSettingsPage() {
+    VOICES = [];
+    let voices = speechSynthesis.getVoices();
+    console.log(`Found ${voices.length} voices`) ;
+    for (let i = 0; i < voices.length ; i++) {
+        let v = Array.isArray(voices) ? voices[i] : voices.item(i);
+        if ((v.lang.startsWith('en')) && (v.localService === true)) {
+            // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
+            VOICES.push(v);
+        }
+    }
+    VOICES.sort(function(a,b) {
+        if (a.lang > b.lang) {
+            return 1;
+          }
+          if (a.lang < b.lang) {
+            return -1;
+          }
+          return 0;
+    });
+
+    const voice_select = document.getElementsByName('voice_select')[0];
+    // Remove voice select options
+    while (voice_select.firstChild) {
+        voice_select.removeChild(voice_select.firstChild);
+    }
+    
+    if ((SETTINGS.voice === undefined) && VOICES) {
+        SETTINGS.voice = VOICES[0].voiceURI;
+        storeProgramsAndSettings();
+    }
+    for (let i in VOICES) {
+        const opt = document.createElement('option');
+        opt.setAttribute('value', i);
+        if (SETTINGS.voice === VOICES[i].voiceURI) {
+            opt.defaultSelected = true;
+        }
+        const content = document.createTextNode(`${VOICES[i].name} (${VOICES[i].lang})`);
+        opt.appendChild(content);
+        voice_select.appendChild(opt);
+    }
+    voice_select.addEventListener('change', function selectVoice() {
+        let v_num = voice_select.options[voice_select.selectedIndex].value;
+        SETTINGS.voice = VOICES[v_num].voiceURI;
+        storeProgramsAndSettings();
+        speak("Nappy Fingers: strong fingers for changing the baby");
+    });
+
+    let checkbox_showDefaultPrograms = document.getElementById('checkbox_showDefaultPrograms');
+    if (SETTINGS.showDefaultPrograms) {
+        checkbox_showDefaultPrograms.setAttribute('checked', 'checked');
+    }
+    checkbox_showDefaultPrograms.addEventListener('change', function setShowDefaultPrograms() {
+        SETTINGS.showDefaultPrograms = this.checked;
+        storeProgramsAndSettings();
+    });
+
+    let checkbox_speechOutput = document.getElementById('checkbox_speechOutput');
+    if (SETTINGS.speechOutput) {
+        checkbox_speechOutput.setAttribute('checked', 'checked');
+    }
+    checkbox_speechOutput.addEventListener('change', function setSpeechOutput() {
+        SETTINGS.speechOutput = this.checked;
+        storeProgramsAndSettings();
+    });
+
+    let checkbox_soundOutput = document.getElementById('checkbox_soundOutput');
+    if (SETTINGS.soundOutput) {
+        checkbox_soundOutput.setAttribute('checked', 'checked');
+    }
+    checkbox_soundOutput.addEventListener('change', function setSoundOutput() {
+        SETTINGS.soundOutput = this.checked;
+        storeProgramsAndSettings();
+    });
+}
+
 function updateMainPage(identifier) {
     const program_select = document.getElementsByName('program_select')[0];
 
@@ -405,12 +518,13 @@ function updateMainPage(identifier) {
                 ? "c0"
                 : "d0";
 
-    // Remove select options
+    // Remove program select options
     while (program_select.firstChild) {
         program_select.removeChild(program_select.firstChild);
     }
     
-    // Populate select options
+    // Populate program select options
+    let showDefaultProgramsExceptionally = false;
     if (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID] && (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].length > 0)) {
         const custom_optgroup = document.createElement('optgroup');
         custom_optgroup.setAttribute('label', 'Your programs'.toUpperCase());
@@ -429,9 +543,9 @@ function updateMainPage(identifier) {
         program_select.appendChild(custom_optgroup);
     }
     else if (!SETTINGS.showDefaultPrograms) {
-        SETTINGS.showDefaultPrograms = true;
+        showDefaultProgramsExceptionally = true;
     }
-    if (SETTINGS.showDefaultPrograms) {
+    if (SETTINGS.showDefaultPrograms || showDefaultProgramsExceptionally) {
         const default_optgroup = document.createElement('optgroup');
         default_optgroup.setAttribute('label', 'Built-in programs'.toUpperCase());
         for (let program_num in DEFAULT_PROGRAMS[SETTINGS.selectedBoardID]) {
@@ -757,6 +871,7 @@ async function handleRouting(event) {
     document.getElementById("edit_content").style.display = "none";
     document.getElementById("about_content").style.display = "none";
     document.getElementById("hangboard_selector_content").style.display = "none";
+    document.getElementById("settings_content").style.display = "none";
     switch (new_page) {
         case "":
             updateMainPage();
@@ -778,7 +893,6 @@ async function handleRouting(event) {
             try {
                 window.plugins.insomnia.keepAwake();
                 await runProgram(BOARDS[SETTINGS.selectedBoardID], program);
-                //navigateTo(""); // TODO: sollte 'back' sein
                 history.back();
             }
             catch (err) {
@@ -797,6 +911,12 @@ async function handleRouting(event) {
             document.getElementById("toolbar_title").innerText = "Hangboard";
             document.getElementById("toolbar_icon_back").style.display = "inline";
             document.getElementById("hangboard_selector_content").style.display = "block";
+            break;
+        case "settings":
+            updateSettingsPage();
+            document.getElementById("toolbar_title").innerText = "Settings";
+            document.getElementById("toolbar_icon_back").style.display = "inline";
+            document.getElementById("settings_content").style.display = "block";
             break;
     }
 }
@@ -864,7 +984,7 @@ function init() {
 	document.getElementById('toolbar_icon_menu').addEventListener('click', function(event){
 		TouchMenu.toggle();
 	}, false);
-     document.getElementById('a_export_programs').addEventListener('click', function(event){
+    document.getElementById('a_export_programs').addEventListener('click', function(event){
         event.preventDefault();
         TouchMenu.close();
         exportPrograms();
@@ -883,6 +1003,11 @@ function init() {
         event.preventDefault();
         TouchMenu.close();
         navigateTo('switch');
+	}, false);
+    document.getElementById('a_settings').addEventListener('click', function(event){
+        event.preventDefault();
+        TouchMenu.close();
+        navigateTo('settings');
 	}, false);
     document.getElementById('drawer').style.display = "block";
     
@@ -916,6 +1041,8 @@ function init() {
         div.appendChild(label);
         hs.appendChild(div);
     }
+
+    speechSynthesis.onvoiceschanged = updateSettingsPage;
 
     handleRouting();
 }
