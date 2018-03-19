@@ -84,7 +84,21 @@ function ticSound() {
 
 function goSound() {
     if (SETTINGS['soundOutput']) {
-        soundEffect(300,0.01,0.1,"triangle",20,0,0,0,false,0,0,undefined,[0.7, 0.1, false]);
+        soundEffect(
+            1046.5,     //frequency
+            0,          //attack
+            0.1,        //decay
+            "sine",     //waveform
+            10,         //Volume
+            0,          //pan
+            0,          //wait before playing
+            0,          //pitch bend amount
+            true,       //reverse bend
+            0,          //random pitch range
+            0,          //dissonance
+            undefined,  //echo array: [delay, feedback, filter]
+            undefined   //reverb array: [duration, decay, reverse?]
+        );
     }
 }
 
@@ -125,9 +139,7 @@ function saveProgramsAsFile() {
     );
     
     function writeFile(fileEntry) {
-        // Create a FileWriter object for our FileEntry (log.txt).
         fileEntry.createWriter(function (fileWriter) {
-    
             fileWriter.onwriteend = function() {
                 console.log("Successful file write...");
                 navigator.notification.alert(
@@ -137,9 +149,7 @@ function saveProgramsAsFile() {
                     'OK'
                 );
             };
-    
             fileWriter.onerror = handleSaveError;
-    
             fileWriter.write(JSON.stringify(CUSTOM_PROGRAMS, null, "    "));
         });
     }
@@ -434,7 +444,6 @@ function getProgram(identifier) {
 function updateSettingsPage() {
     VOICES = [];
     let voices = speechSynthesis.getVoices();
-    console.log(`Found ${voices.length} voices`) ;
     for (let i = 0; i < voices.length ; i++) {
         let v = Array.isArray(voices) ? voices[i] : voices.item(i);
         if ((v.lang.startsWith('en')) && (v.localService === true)) {
@@ -451,6 +460,7 @@ function updateSettingsPage() {
           }
           return 0;
     });
+    console.log(`Found ${VOICES.length} matching voices`) ;
 
     const voice_select = document.getElementById('select_voice');
     // Remove voice select options
@@ -650,7 +660,9 @@ function updateEditPage(identifier) {
     if (document.getElementById('program_edit')) {
         edit_content.removeChild(document.getElementById('program_edit'));
     }
-
+    
+    const placeholder = document.getElementById('edit_placeholder');
+    
     const template_edit = document.getElementById('template_edit');
     const fragment = template_edit.content.cloneNode(true);
 
@@ -686,7 +698,7 @@ function updateEditPage(identifier) {
         updateEditPage(identifier);
     });
 
-    edit_content.appendChild(fragment);
+    edit_content.insertBefore(fragment, placeholder);
     
     const form = document.getElementById('program_edit');
     const template_edit_exercise = document.getElementById('template_edit_exercise');
