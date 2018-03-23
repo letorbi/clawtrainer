@@ -259,6 +259,9 @@ function loadProgramsAndSettings() {
 
 function speak(message) {
     if (SETTINGS['speechOutput']) {
+        if (VOICES.length < 1) {
+            getVoices();
+        }
         let selected_voice;
         for (let i in VOICES) {
             if (VOICES[i].voiceURI === SETTINGS.voice) {
@@ -441,7 +444,7 @@ function getProgram(identifier) {
     return program;
 }
 
-function updateSettingsPage() {
+function getVoices() {
     VOICES = [];
     let voices = speechSynthesis.getVoices();
     for (let i = 0; i < voices.length ; i++) {
@@ -462,16 +465,23 @@ function updateSettingsPage() {
     });
     console.log(`Found ${VOICES.length} matching voices`) ;
 
+    if ((SETTINGS.voice === undefined) && VOICES) {
+        SETTINGS.voice = VOICES[0].voiceURI;
+        storeProgramsAndSettings();
+    }
+}
+
+function updateSettingsPage() {
+    if (VOICES.length < 1) {
+        getVoices();
+    }
+
     const voice_select = document.getElementById('select_voice');
     // Remove voice select options
     while (voice_select.firstChild) {
         voice_select.removeChild(voice_select.firstChild);
     }
     
-    if ((SETTINGS.voice === undefined) && VOICES) {
-        SETTINGS.voice = VOICES[0].voiceURI;
-        storeProgramsAndSettings();
-    }
     for (let i in VOICES) {
         const opt = document.createElement('option');
         opt.setAttribute('value', i);
@@ -994,7 +1004,8 @@ function init() {
 	var TouchMenu = TouchMenuLA({
 		target: document.getElementById('drawer'),
         width: Math.min(Math.min(screen.availWidth, screen.availHeight) - 56, 280),
-        zIndex: 2 
+        zIndex: 2,
+        handleSize: 0
 	});
 	document.getElementById('toolbar_icon_menu').addEventListener('click', function(event){
 		TouchMenu.toggle();
