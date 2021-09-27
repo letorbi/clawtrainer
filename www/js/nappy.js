@@ -258,12 +258,9 @@ function loadProgramsAndSettings() {
 }
 
 function speak(message) {
-    if (SETTINGS['speechOutput']) {
+    if (SETTINGS['speechOutput'] && SETTINGS.voice) {
         if (VOICES.length < 1) {
             getVoices();
-            if (VOICES.length < 1) {
-                return;
-            }
         }
         let selected_voice;
         for (let i in VOICES) {
