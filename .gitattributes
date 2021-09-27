@@ -1,0 +1,4 @@
+# Auto detect text files and perform LF normalization
+# https://stackoverflow.com/questions/170961/whats-the-best-crlf-carriage-return-line-feed-handling-strategy-with-git
+
+* text=auto
