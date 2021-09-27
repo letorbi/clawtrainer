@@ -241,6 +241,14 @@ function loadProgramsAndSettings() {
         console.log('Using default settings.');
     }
 
+    if (SETTINGS.voice === undefined) {
+        console.log('No voice selected. Selecting first system voice if available.');
+        getVoices();
+        if (VOICES[0] !== undefined) {
+            SETTINGS.voice = VOICES[0].voiceURI;
+        }
+    }
+
     if (window.localStorage.getItem('programs')) {
         CUSTOM_PROGRAMS = JSON.parse(window.localStorage.getItem('programs'));
         if (CUSTOM_PROGRAMS.version == DEFAULT_PROGRAMS.version) {
@@ -464,11 +472,6 @@ function getVoices() {
           return 0;
     });
     console.log(`Found ${VOICES.length} matching voices`) ;
-
-    if ((SETTINGS.voice === undefined) && VOICES[0] !== undefined) {
-        SETTINGS.voice = VOICES[0].voiceURI;
-        storeProgramsAndSettings();
-    }
 }
 
 function updateSettingsPage() {
