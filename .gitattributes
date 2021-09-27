@@ -2,3 +2,13 @@
 # https://stackoverflow.com/questions/170961/whats-the-best-crlf-carriage-return-line-feed-handling-strategy-with-git
 
 * text=auto
+
+*.html text
+*.xml text
+
+*.css text
+*.js text
+*.json text
+
+*.txt text
+*.md text
