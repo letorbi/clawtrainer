@@ -261,6 +261,9 @@ function speak(message) {
     if (SETTINGS['speechOutput']) {
         if (VOICES.length < 1) {
             getVoices();
+            if (VOICES.length < 1) {
+                return;
+            }
         }
         let selected_voice;
         for (let i in VOICES) {
@@ -465,7 +468,7 @@ function getVoices() {
     });
     console.log(`Found ${VOICES.length} matching voices`) ;
 
-    if ((SETTINGS.voice === undefined) && VOICES) {
+    if ((SETTINGS.voice === undefined) && VOICES[0] !== undefined) {
         SETTINGS.voice = VOICES[0].voiceURI;
         storeProgramsAndSettings();
     }
