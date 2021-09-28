@@ -455,22 +455,24 @@ function getProgram(identifier) {
 function getVoices() {
     VOICES = [];
     let voices = speechSynthesis.getVoices();
-    for (let i = 0; i < voices.length ; i++) {
-        let v = Array.isArray(voices) ? voices[i] : voices.item(i);
-        if ((v.lang.startsWith('en')) && (v.localService === true)) {
-            // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
-            VOICES.push(v);
+    if (voices !== null) {
+        for (let i = 0; i < voices.length ; i++) {
+            let v = Array.isArray(voices) ? voices[i] : voices.item(i);
+            if ((v.lang.startsWith('en')) && (v.localService === true)) {
+                // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
+                VOICES.push(v);
+            }
         }
+        VOICES.sort(function(a,b) {
+            if (a.lang > b.lang) {
+                return 1;
+              }
+              if (a.lang < b.lang) {
+                return -1;
+              }
+              return 0;
+        });
     }
-    VOICES.sort(function(a,b) {
-        if (a.lang > b.lang) {
-            return 1;
-          }
-          if (a.lang < b.lang) {
-            return -1;
-          }
-          return 0;
-    });
     console.log(`Found ${VOICES.length} matching voices`) ;
 }
 
