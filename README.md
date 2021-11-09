@@ -7,8 +7,6 @@ Nappy Fingers is mainly an Android app, but other platforms supported by [Apache
 
 ## Features
 
-Nappy Fingers provides:
-
 * Spoken instructions in English language
 * Visual instructions with photos
 * Integrated training programs
@@ -45,4 +43,4 @@ Feedback and contributions are welcome. If you send us your custom programs, we 
 
 ----
 
-Copyright 2018-2021 the Nappy FIngers contributors
+Copyright 2018-2021 the Nappy Fingers contributors
