@@ -15,6 +15,22 @@ Nappy Fingers is mainly an Android app, but other platforms supported by [Apache
 * No network connection required
 * It is entirely free!
 
+## Building
+
+Nappy Fingers uses Apache Cordova to run as a native app, so please make sure that Cordova and its dependencies (Java 8, Gradle) are installed properly. Android Studio should be installed as well.
+
+Once all build-tools are installed, only the following commands are required to build the Android app:
+
+```
+$ cordova platform add android
+$ cordova build
+
+```
+
+This will create an Android Studio project in the subfolder *platforms/android*. The command `cordova run --emulator` can be used, to start the app directly in an emulated Android device.
+
+Even though Cordova theoretically allows to build Nappy Fingers for iOS or other plattforms, Nappy Fingers is currently only tested on Android.
+
 ## Training methods
 
 ### Hangboard repeaters
