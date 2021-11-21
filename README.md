@@ -24,7 +24,6 @@ Once all build-tools are installed, only the following commands are required to 
 ```
 $ cordova platform add android
 $ cordova build
-
 ```
 
 This will create an Android Studio project in the subfolder *platforms/android*. The command `cordova run --emulator` can be used, to start the app directly in an emulated Android device.
