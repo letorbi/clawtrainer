@@ -6,6 +6,7 @@
     <content src="index.html" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="23" />
+    <hook type="before_prepare" src="scripts/beforePrepare.js" />
     <platform name="android">
         <allow-intent href="market:*" />
         <icon density="ldpi" src="res/android/ldpi.png" />
