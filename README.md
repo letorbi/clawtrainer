@@ -23,10 +23,10 @@ Once all build-tools are installed, only the following commands are required to 
 
 ```
 $ cordova platform add android
-$ cordova build
+$ cordova build android
 ```
 
-This will create an Android Studio project in the subfolder *platforms/android*. The command `cordova run --emulator` can be used, to start the app directly in an emulated Android device.
+This will create an Android Studio project in the subfolder *platforms/android*. The command `cordova run android --emulator` can be used, to start the app directly in an emulated Android device.
 
 Even though Cordova also supports iOS or other plattforms, Nappy Fingers is currently only tested on Android. Feel free to try other platforms, but your mileage may vary. 
 
