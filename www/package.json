@@ -3,6 +3,7 @@
   "description": "",
   "version": "0.1.0",
   "dependencies": {
+    "hammerjs": "^2.0.8",
     "sound": "github:kittykatattack/sound.js",
     "touch-menu-la": "^0.5.0"
   }
