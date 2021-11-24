@@ -1,7 +1,7 @@
 # Nappy Fingers
 
 Finger strength is important for hard climbing. Hangboards (fingerboards) are the most effective way to improve finger strength.
-This app supports you in your training on **Beastmaker 1000**, **Beastmaker 2000** and **griptonite** hangboards. Other hangboards will be supported eventually.
+This app supports you in your training on *Beastmaker 1000*, *Beastmaker 2000* and *Smartrock Griptonite* hangboards. Other hangboards will be supported eventually.
 
 Nappy Fingers is mainly an Android app, but other platforms supported by [Apache Cordova](https://cordova.apache.org/) might work as well. It is licensed as open-source under the GPL version 3.
 
