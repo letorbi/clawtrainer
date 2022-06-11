@@ -203,7 +203,7 @@ Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
         <script src="js/nappy.js"></script>
         <script src="cordova.js"></script>
         <script>
-            var APP = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
+            var APP = window.hasOwnProperty("_cordovaNative");
             var exportPrograms;
             if ( APP ) {
                 exportPrograms = saveProgramsAsFile;
