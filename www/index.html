@@ -193,9 +193,10 @@ Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
             </div>
             <input type="file" id="fileElem" style="display:none" onchange="uploadPrograms(this.files)">
         </div>
+        <script>var module = {}; // Just to make sound.js happy</script>
+        <script src="node_modules/sound/sound.js"></script>
         <script src="js/boards.js"></script>
         <script src="js/programs.js"></script>
-        <script src="js/sound.js"></script>
         <script src="js/nappy.js"></script>
         <script src="js/hammer.min.js"></script>
         <script src="js/touch-menu-la.js"></script>

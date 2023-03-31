@@ -2,6 +2,7 @@
   "name": "",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "sound": "github:kittykatattack/sound.js"
+  }
 }
