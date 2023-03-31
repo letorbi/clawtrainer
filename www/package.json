@@ -3,6 +3,7 @@
   "description": "",
   "version": "0.1.0",
   "dependencies": {
-    "sound": "github:kittykatattack/sound.js"
+    "sound": "github:kittykatattack/sound.js",
+    "touch-menu-la": "^0.5.0"
   }
 }

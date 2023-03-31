@@ -26,7 +26,7 @@ Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
 
         <title>Nappy Fingers</title>
         <link href="css/nappy.css" rel="stylesheet" />
-        <link href="css/touch-menu-la.css" rel="stylesheet" />
+        <link href="node_modules/touch-menu-la/src/css/touch-menu-la.min.css" rel="stylesheet" />
     </head>
     <body>
         <h1 class="toolbar"><span id="toolbar_icon_menu"><i class="material-icons md-dark">menu</i></span><a href="#" id="toolbar_icon_back" onclick="window.history.back();return false"><i class="material-icons md-dark">arrow_back</i></a><span id="toolbar_title">Nappy Fingers</span></h1>
@@ -195,11 +195,11 @@ Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
         </div>
         <script>var module = {}; // Just to make sound.js happy</script>
         <script src="node_modules/sound/sound.js"></script>
+        <script src="node_modules/touch-menu-la/src/js/touch-menu-la.min.js"></script>
         <script src="js/boards.js"></script>
         <script src="js/programs.js"></script>
         <script src="js/nappy.js"></script>
         <script src="js/hammer.min.js"></script>
-        <script src="js/touch-menu-la.js"></script>
         <script src="cordova.js"></script>
         <script>
             var APP = document.URL.indexOf( 'http://' ) === -1 && document.URL.indexOf( 'https://' ) === -1;
