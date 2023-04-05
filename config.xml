@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="de.danielschroeer.nappyfingers" version="1.3.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-    <name>Nappy Fingers</name>
-    <description>Strong fingers for changing the baby</description>
-    <author email="danielschroeeer@gmail.com" href="http://www.danielschroeer.de">Daniel Schröer</author>
+<widget id="com.letorbi.clawtrainer" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>Claw Trainer</name>
+    <description>Strong fingers for strong climbing</description>
+    <author email="clawtrainer@letorbi.com" href="https://letorbi.com">Torben Haase</author>
     <content src="index.html" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="23" />

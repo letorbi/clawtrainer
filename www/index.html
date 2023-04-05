@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 
 <!--
-This file is part of Nappy Fingers.
+This file is part of Claw Trainer.
 
-Copyright (c) 2018-2021 the Nappy Fingers contributors
+Copyright (c) 2017-2021 Daniel Schroer
+Copyright (c) 2021-2023 Daniel Schroer & contributors
+Copyright (c) 2023 Torben Haase & contributors
 
-Nappy Fingers is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Sorftware
+Claw Trainer is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version.
 
-Nappy Fingers is distributed in the hope that it will be useful, but WITHOUT
+Claw Trainer is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
-Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
+Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <html lang="en">
@@ -24,12 +26,12 @@ Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
         <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src * 'unsafe-inline'; media-src *" />
 
-        <title>Nappy Fingers</title>
+        <title>Claw Trainer</title>
         <link href="css/nappy.css" rel="stylesheet" />
         <link href="node_modules/touch-menu-la/src/css/touch-menu-la.min.css" rel="stylesheet" />
     </head>
     <body>
-        <h1 class="toolbar"><span id="toolbar_icon_menu"><i class="material-icons md-dark">menu</i></span><a href="#" id="toolbar_icon_back" onclick="window.history.back();return false"><i class="material-icons md-dark">arrow_back</i></a><span id="toolbar_title">Nappy Fingers</span></h1>
+        <h1 class="toolbar"><span id="toolbar_icon_menu"><i class="material-icons md-dark">menu</i></span><a href="#" id="toolbar_icon_back" onclick="window.history.back();return false"><i class="material-icons md-dark">arrow_back</i></a><span id="toolbar_title">Claw Trainer</span></h1>
         <div id="content">
             <div id="main_content">
                 <select class="big_select" name="program_select"></select>
@@ -120,23 +122,12 @@ Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
                 <div id="edit_placeholder"><img src="images/nappy.png" /></div>
             </div>
             <div id="about_content">
-                <h2>Nappy Fingers</h2>
-                <p>Finger strength is important for hard climbing. Hangboards (fingerboards) are the most effective way to improve finger strength. This app supports you in your training on <em>Beastmaker 1000</em>, <em>Beastmaker 2000</em> and <em>Smartrock Griptonite</em> hangboards. Other hangboards will be supported eventually.</p>
-                <p>Nappy Fingers is licensed as open-source under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">the GPL version 3</a>.</p>
-                <h3>Hangboard repeaters</h3>
-                <p>Training on hangboards means executing sets of short hangs with short rests in between. A set may consist of six hangs of seven seconds each, for example, seperated by rests of three seconds each. All six repeats are done on the same holds with the same grip type (finger position). Such a set is called an <i>exercise</i> is Nappy Fingers. After the exercise, you take a rest for some minutes. Then you move on to the next exercise on other holds. A complete workout of several exercises is called a <i>program</i> in Nappy Fingers.</p>
-                <p>The repeater method trains both your strength endurance and your maximum strength.</p>
-                <h3>Maximum hangs</h3>
-                <p>An alternative method is to hang for longer times of ten or twelve seconds. Holds and grip type are chosen such that each hang requires maximum effort. The rests between the hangs are much longer, up to three or five minutes, to allow for a full recovery. A set again comprises three or five repeats on the same hold.</p>
-                <p>The maximum hangs method mostly improves maximum strength. Dave MacLeod explains this method in <a href="https://youtu.be/VeKE5VH5-qg" target="_blank">this video</a>.</p>
-                <h3>Smart beastmaking</h3>
-                <p>Nappy Fingers is useful for both methods and comes with a number of built-in programs for both methods. Nappy Fingers guides you through these programs with detailed instructions, using spoken language, pictures and descriptive texts.</p>
-                <p>An integrated editor allows to modify these programs and to create new custom programs according to your own preferences. There is an option for exporting and importing custom programs as JSON files. These files can be edited with a normal text editor and can easily be shared with other people.</p>
-                <h3>Strong fingers for changing the baby</h3>
-                <p>Daniel got himself a hangboard and wrote this app when he had his first baby. Torben joined the development team when his second baby-time started. There is less time for actual climbing now, but still enough room for an occasional hangboard session between changing the diapers.</p>
-                <p>Feedback and contributions are welcome. If you send us your custom programs, we will consider them for inclusion as built-ins.</p>
-                <hr>
-                <p>Copyright 2018-2021 <a href="https://github.com/schroeer/Nappy-Fingers/">the Nappy Fingers contributors</a></p>
+                <h2>Claw Trainer</h2>
+                <p>Claw Trainer is licensed as open-source under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">the GPL version 3</a>.</p>
+                <p><a href="https://github.com/letorbi/clawtrainer/">See the source code and report issues on GitHub.</a></p>
+                <p>Copyright (c) 2017-2020 Daniel Schroer<br>
+                Copyright (c) 2020-2023 Daniel Schroer & contributors<br>
+                Copyright (c) 2023 Torben Haase & contributors</p>
             </div>
             <div id="hangboard_selector_content">
                 <form id="hangboard_select" onsubmit="return false;"></form>

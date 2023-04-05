@@ -1,18 +1,20 @@
 /*
-This file is part of Nappy Fingers.
+This file is part of Claw Trainer.
 
-Copyright (c) 2018-2021 the Nappy Fingers contributors
+Copyright (c) 2017-2020 Daniel Schroer
+Copyright (c) 2020-2023 Daniel Schroer & contributors
+Copyright (c) 2023 Torben Haase & contributors
 
-Nappy Fingers is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Sorftware
+Claw Trainer is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version.
 
-Nappy Fingers is distributed in the hope that it will be useful, but WITHOUT
+Claw Trainer is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
-Nappy Fingers. If not, see <https://www.gnu.org/licenses/>.
+Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
 "use strict";
@@ -520,7 +522,7 @@ function updateSettingsPage() {
         storeProgramsAndSettings();
         let temp = SETTINGS['speechOutput'];
         SETTINGS['speechOutput'] = true;
-        speak("Nappy Fingers: strong fingers for changing the baby");
+        speak("Claw Trainer: Strong fingers for strong climbing");
         SETTINGS['speechOutput'] = temp;
     };
 
@@ -922,7 +924,7 @@ async function handleRouting(event) {
     switch (new_page) {
         case "":
             updateMainPage();
-            document.getElementById("toolbar_title").innerText = "Nappy Fingers";
+            document.getElementById("toolbar_title").innerText = "Claw Trainer";
             document.getElementById("toolbar_icon_menu").style.display = "inline";
             document.getElementById("main_content").style.display = "block";
             break;

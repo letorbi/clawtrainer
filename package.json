@@ -1,8 +1,8 @@
 {
-  "name": "de.danielschroeer.nappyfingers",
-  "description": "Strong fingers for changing the baby",
-  "version": "1.3.0",
-  "displayName": "Nappy Fingers",
+  "name": "com.letorbi.clawtrainer",
+  "description": "Strong fingers for strong climbing",
+  "version": "1.0.0",
+  "displayName": "Claw Trainer",
   "cordova": {
     "platforms": [
       "android",
