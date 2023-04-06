@@ -12,3 +12,74 @@
 
 *.txt text
 *.md text
+
+# Binary files
+
+# Images
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.psd binary
+*.ai binary
+*.ico binary
+*.exr binary
+*.svgz binary
+*.tga binary
+*.tif binary
+*.tiff binary
+
+# Audio
+*.mp3 binary
+*.wav binary
+*.ogg binary
+
+# Videos
+*.avi binary
+*.mkv binary
+*.mp4 binary
+*.mov binary
+
+# 3D Objects
+*.FBX binary
+*.fbx binary
+*.blend binary
+*.obj binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.eot binary
+*.woff binary
+*.woff2 binary
+
+# Archives
+*.7z binary
+*.bz2 binary
+*.gz binary
+*.rar binary
+*.xz binary
+*.zip binary
+
+# Documents
+*.doc binary diff=astextplain
+*.docx binary diff=astextplain
+*.dot binary diff=astextplain
+*.pdf binary diff=astextplain
+*.rtf binary diff=astextplain
+*.odt binary diff=odf
+*.ods binary diff=odf
+*.odp binary diff=odf
+
+# other
+*.a binary
+*.exe binary
+*.tga binary
+*.pdf binary
+*.dll binary
+*.unitypackage binary
+*.aif binary
+*.rns binary
+*.reason binary
+*.lxo binary
+*.so binary
