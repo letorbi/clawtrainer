@@ -51,7 +51,7 @@ An integrated editor allows to modify these programs and to create new custom pr
 
 ## Contributions
 
-Claw Trainer is based on Nappy Fingers, which was developed by Daniel Schroeer since 2018 and released under the GNU GPL v3 in 2021. Unfortunately he decided to retire as lead developer in 2023 and asked that future releases were made under a new name.
+Claw Trainer is based on Nappy Fingers, which was developed by Daniel Schroeer since 2018 and released under the GNU GPL v3 in 2021. Unfortunately he decided to retire as lead developer in 2023 and asked that future releases will be published under a new name.
 
 Feedback and contributions are welcome. Please create a pull request, if you have updates to the code. If you send us your custom programs, they will be considered for inclusion as built-ins.
 
