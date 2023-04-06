@@ -10,12 +10,11 @@
     <hook type="before_prepare" src="scripts/beforePrepare.js" />
     <platform name="android">
         <allow-intent href="market:*" />
-        <icon density="ldpi" src="res/android/ldpi.png" />
-        <icon density="mdpi" src="res/android/mdpi.png" />
-        <icon density="hdpi" src="res/android/hdpi.png" />
-        <icon density="xhdpi" src="res/android/xhdpi.png" />
-        <icon density="xxhdpi" src="res/android/xxhdpi.png" />
-        <icon density="xxxhdpi" src="res/android/xxxhdpi.png" />
+        <icon background="res/android/mipmap-mdpi/ic_launcher_background.png" density="mdpi" foreground="res/android/mipmap-mdpi/ic_launcher_foreground.png" />
+        <icon background="res/android/mipmap-hdpi/ic_launcher_background.png" density="hdpi" foreground="res/android/mipmap-hdpi/ic_launcher_foreground.png" />
+        <icon background="res/android/mipmap-xhdpi/ic_launcher_background.png" density="xhdpi" foreground="res/android/mipmap-xhdpi/ic_launcher_foreground.png" />
+        <icon background="res/android/mipmap-xxhdpi/ic_launcher_background.png" density="xxhdpi" foreground="res/android/mipmap-xxhdpi/ic_launcher_foreground.png" />
+        <icon background="res/android/mipmap-xxxhdpi/ic_launcher_background.png" density="xxxhdpi" foreground="res/android/mipmap-xxxhdpi/ic_launcher_foreground.png" />
         <preference name="RecentsBackgroundColor" value="#9bcdff" />
     </platform>
     <access origin="*" />
