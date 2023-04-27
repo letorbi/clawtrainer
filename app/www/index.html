@@ -184,31 +184,11 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
             </div>
             <input type="file" id="fileElem" style="display:none" onchange="uploadPrograms(this.files)">
         </div>
+        <script src="cordova.js"></script>
         <script>var module = {}; // Just to make sound.js happy</script>
         <script src="node_modules/sound/sound.js"></script>
         <script src="node_modules/touch-menu-la/src/js/touch-menu-la.min.js"></script>
         <script src="node_modules/hammerjs/hammer.min.js"></script>
-        <script src="js/boards.js"></script>
-        <script src="js/programs.js"></script>
-        <script src="js/nappy.js"></script>
-        <script src="cordova.js"></script>
-        <script>
-            var APP = window.hasOwnProperty("_cordovaNative");
-            var exportPrograms;
-            if ( APP ) {
-                exportPrograms = saveProgramsAsFile;
-                document.addEventListener('deviceready', function() {
-                    console.log('Running as app');
-                    init();
-                }, false);
-            }
-            else {
-                console.log('Running in browser');
-                exportPrograms = downloadPrograms;
-                window.plugins = { insomnia: { keepAwake: function() {}, allowSleepAgain: function() {} } };
-                StatusBar = { hide: function() {} };
-                init();
-            }  
-        </script>
+        <script type="module" src="js/nappy.js"></script>
     </body>
 </html>

@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-"use strict";
+import {BOARDS} from "./boards.js";
+import {DEFAULT_PROGRAMS} from "./programs.js";
 
 var DEFAULT_SETTINGS = {
     'version': 4,
@@ -1097,3 +1098,21 @@ function init() {
     handleRouting();
 }
 
+var exportPrograms;
+(function() {
+    var APP = window.hasOwnProperty("_cordovaNative");
+    if ( APP ) {
+        exportPrograms = saveProgramsAsFile;
+        document.addEventListener('deviceready', function() {
+            console.log('Running as app');
+            init();
+        }, false);
+    }
+    else {
+        console.log('Running in browser');
+        exportPrograms = downloadPrograms;
+        window.plugins = { insomnia: { keepAwake: function() {}, allowSleepAgain: function() {} } };
+        window.StatusBar = { hide: function() {} };
+        init();
+    }
+})();

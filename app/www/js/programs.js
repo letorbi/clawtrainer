@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-const DEFAULT_PROGRAMS = {
+export const DEFAULT_PROGRAMS = {
     "version": 3,
     "bm1000": [
         {
@@ -587,7 +587,7 @@ const DEFAULT_PROGRAMS = {
     ]
 };
 
-var OLD = [
+export const OLD = [
     {
         "title":        "Ralfi Beginner", // https://ralfisordinarylife.files.wordpress.com/2016/02/hangboard-training-plan-beginner.pdf
         "description":  "Hangboard training plan for beginners",

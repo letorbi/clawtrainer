@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-const BOARDS = {
+export const BOARDS = {
     "bm1000": {
         "name":  "Beastmaker 1000",
         "image": "bm1000.png",
