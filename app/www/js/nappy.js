@@ -35,7 +35,7 @@ var VOICES = [];
 
 const COUNTER = (function () {
     var count, timer, paused, resolve, reject, steps, interval, cb;
-    
+
     function step() {
         if (++count == steps) {
             window.clearInterval(timer);
@@ -45,7 +45,7 @@ const COUNTER = (function () {
             cb(count);
         }
     }
-    
+
     return {
         start: function start(_steps, _interval, _cb) {
             steps = _steps;
@@ -79,12 +79,12 @@ const COUNTER = (function () {
             window.clearInterval(timer);
             resolve();
         }
-    }
+    };
 })();
 
 function ticSound() {
     if (SETTINGS['soundOutput']) {
-        soundEffect(
+        window.soundEffect(
             400,        //frequency
             0.02,       //attack
             0.02,       //decay
@@ -104,7 +104,7 @@ function ticSound() {
 
 function goSound() {
     if (SETTINGS['soundOutput']) {
-        soundEffect(
+        window.soundEffect(
             1046.5,     //frequency
             0,          //attack
             0.1,        //decay
@@ -124,9 +124,9 @@ function goSound() {
 
 function completedSound() {
     if (SETTINGS['soundOutput']) {
-        soundEffect( 587.33, 0, 0.2, "square", 1, 0, 0);    //D
-        soundEffect( 880   , 0, 0.2, "square", 1, 0, 0.1);  //A
-        soundEffect(1174.66, 0, 0.3, "square", 1, 0, 0.2);  //High D
+        window.soundEffect( 587.33, 0, 0.2, "square", 1, 0, 0);    //D
+        window.soundEffect( 880   , 0, 0.2, "square", 1, 0, 0.1);  //A
+        window.soundEffect(1174.66, 0, 0.3, "square", 1, 0, 0.2);  //High D
     }
 }
 
@@ -146,7 +146,7 @@ function saveProgramsAsFile() {
     const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
 
     window.resolveLocalFileSystemURL(
-        cordova.file.externalRootDirectory,
+        window.cordova.file.externalRootDirectory,
         function (dirEntry) {
             dirEntry.getFile(
                 filename,
@@ -157,11 +157,10 @@ function saveProgramsAsFile() {
         },
         handleSaveError
     );
-    
+
     function writeFile(fileEntry) {
         fileEntry.createWriter(function (fileWriter) {
             fileWriter.onwriteend = function() {
-                console.log("Successful file write...");
                 navigator.notification.alert(
                     `Exported custom programs as '${filename}'.`,
                     null,
@@ -175,7 +174,6 @@ function saveProgramsAsFile() {
     }
 
     function handleSaveError(e)  {
-        console.log(`Export failed (error code: ${e.code}).`);
         navigator.notification.alert(
             `Export failed (error code: ${e.code}).`,
             null,
@@ -184,6 +182,10 @@ function saveProgramsAsFile() {
         );
     }
 }
+
+document.getElementById("fileElem").onchange  = function() {
+    uploadPrograms(this.files);
+};
 
 function uploadPrograms(files) {
     const file = files[0];
@@ -211,14 +213,14 @@ function uploadPrograms(files) {
             }
         }
         catch(error) {
-            console.log(error);
+            console.error(error);
         }
     };
     reader.readAsText(file);
 
     function doImport(ct) {
         CUSTOM_PROGRAMS = ct;
-        console.log(`Imported ${countPrograms(ct)} programs from file '${file.name}'`);
+        console.info(`Imported ${countPrograms(ct)} programs from file '${file.name}'`);
         storeProgramsAndSettings();
         updateMainPage();
     }
@@ -226,7 +228,7 @@ function uploadPrograms(files) {
     function countPrograms(p) {
         let num = 0;
         for (const board in p) {
-            if ((board != 'version') && (p.hasOwnProperty(board))) {
+            if ((board != 'version') && (Object.prototype.hasOwnProperty.call(p, board))) {
                 num += p[board].length;
             }
         }
@@ -237,7 +239,6 @@ function uploadPrograms(files) {
 function storeProgramsAndSettings() {
     window.localStorage.setItem('settings', JSON.stringify(SETTINGS));
     window.localStorage.setItem('programs', JSON.stringify(CUSTOM_PROGRAMS));
-    console.log('Stored programs and settings in local storage');
 }
 
 function loadProgramsAndSettings() {
@@ -245,24 +246,21 @@ function loadProgramsAndSettings() {
         let loaded_settings = JSON.parse(window.localStorage.getItem('settings'));
         SETTINGS = DEFAULT_SETTINGS;
         for (let prop in DEFAULT_SETTINGS) {
-            if ((prop != 'version') &&  (loaded_settings.hasOwnProperty(prop))) {
+            if ((prop != 'version') &&  (Object.prototype.hasOwnProperty.call(loaded_settings, prop))) {
                 SETTINGS[prop] = loaded_settings[prop];
             }
         }
-        if (SETTINGS.version == DEFAULT_SETTINGS.version) {
-            console.log('Restored settings from storage.');
-        }
-        else {
-            console.log('Stored settings outdated. Partially restored.');
+        if (SETTINGS.version != DEFAULT_SETTINGS.version) {
+            console.warn('Stored settings outdated. Partially restored.');
         }
     }
     else {
         SETTINGS = DEFAULT_SETTINGS;
-        console.log('Using default settings.');
+        console.info('Using default settings.');
     }
 
     if (SETTINGS.voice === undefined) {
-        console.log('No voice selected. Selecting first system voice if available.');
+        console.warn('No voice selected. Selecting first system voice if available.');
         getVoices();
         if (VOICES[0] !== undefined) {
             SETTINGS.voice = VOICES[0].voiceURI;
@@ -271,17 +269,14 @@ function loadProgramsAndSettings() {
 
     if (window.localStorage.getItem('programs')) {
         CUSTOM_PROGRAMS = JSON.parse(window.localStorage.getItem('programs'));
-        if (CUSTOM_PROGRAMS.version == DEFAULT_PROGRAMS.version) {
-            console.log('Restored custom programs from storage.');
-        }
-        else {
+        if (CUSTOM_PROGRAMS.version != DEFAULT_PROGRAMS.version) {
             CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
-            console.log('Stored custom programs outdated. Discarding. Sorry for that.');
+            console.warn('Stored custom programs outdated. Discarding. Sorry for that.');
         }
     }
     else {
         CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
-        console.log('No stored custom programs found.');
+        console.info('No stored custom programs found.');
     }
 }
 
@@ -301,11 +296,11 @@ function speak(message) {
         utterance.text = message;
         utterance.lang = 'en-US';
         utterance.voice = selected_voice;
-        console.log(`Speaking "${message}"`);
+        console.info(`Speaking "${message}"`);
         speechSynthesis.speak(utterance);
     }
     else {
-        console.log(`Not speaking "${message}"`);
+        console.warn(`Not speaking: "${message}"`);
     }
 }
 
@@ -316,9 +311,9 @@ async function runProgram(board, program) {
     const hold_pbar = document.getElementById("hold_pbar");
     const rest_pbar = document.getElementById("rest_pbar");
     const pause_pbar = document.getElementById("pause_pbar");
-    
+
     document.querySelector('#run_content .board_img').src = "images/" + board.image;
-    
+
     for (let i in program.exercises) {
         let exercise = program.exercises[i];
         if (exercise.pause < 15) {
@@ -334,7 +329,7 @@ async function runProgram(board, program) {
             exercise_title_div.textContent = "Get ready";
             exercise_description_div.textContent = "";
         }
-        
+
         document.querySelectorAll("#run_content .overlay_img").forEach(function(element) {
             element.src = "";
         });
@@ -346,20 +341,19 @@ async function runProgram(board, program) {
         document.getElementById("exercise_counter").textContent = Number(i) + 1 + "/" + program.exercises.length;
         document.getElementById("repeat_counter").textContent = "   ";
 
-        console.log(`pause ${exercise.pause} seconds`);
         await COUNTER.start(
             exercise.pause,
             1000,
             function pauseCountdownStep(step) {
                 time_counter.textContent = exercise.pause - step;
                 pause_pbar.value = step + 1;
-                
+
                 if (exercise.pause - step == 15) { // 15s vor Ende der Pause: Ankündigung des nächsten Satzes
                     speak(`Next exercise: ${exercise.description} for ${exercise.hold} seconds. Left hand ${board.left_holds[exercise.left].name}. Right hand ${board.right_holds[exercise.right].name}. Repeat ${exercise.repeat} ${((exercise.repeat > 1) ? "times" : "time")}.`);
 
                     exercise_title_div.textContent = exercise.title;
                     exercise_description_div.textContent = exercise.description;
-                    
+
                     document.querySelector("#run_content .overlay_left").src = board.left_holds[exercise.left].image ? "images/" + board.left_holds[exercise.left].image : "";
                     document.querySelector("#run_content .overlay_right").src = board.right_holds[exercise.right].image ? "images/" + board.right_holds[exercise.right].image : "";
                 }
@@ -375,7 +369,6 @@ async function runProgram(board, program) {
         await runExercise(exercise);
     }
     speak("Congratulations!");
-    console.log("Program completed");
     navigator.notification.alert(
         `You have completed program ${program.title}!`,
         null,
@@ -387,13 +380,13 @@ async function runProgram(board, program) {
         pause_pbar.style.display = "none";
         hold_pbar.style.display = "inline-block";
         rest_pbar.style.display = "inline-block";
-        
+
         hold_pbar.max = exercise.hold;
         hold_pbar.style.width = 100 * exercise.hold / (exercise.hold + exercise.rest) + "%";
 
         rest_pbar.max = exercise.rest;
         rest_pbar.style.width = 100 * exercise.rest / (exercise.hold + exercise.rest) + "%";
-        
+
         for (let rep = 0; rep < exercise.repeat; rep++) {
             hold_pbar.value = 0;
             rest_pbar.value = 0;
@@ -402,8 +395,7 @@ async function runProgram(board, program) {
             }
 
             document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
-            
-            console.log(`rep ${rep+1}: hold`);
+
             if (!SETTINGS.speechOutput) {
                 goSound();
             }
@@ -418,8 +410,6 @@ async function runProgram(board, program) {
             );
             completedSound();
 
-            console.log(`rep ${rep+1}: rest`);
-            
             if (rep < exercise.repeat - 1) { // bei letzter Wiederholung keine rest-Pause
                 await COUNTER.start(
                     exercise.rest,
@@ -435,9 +425,8 @@ async function runProgram(board, program) {
                 );
             }
         }
-        console.log("exercise complete");
     }
-    
+
     function makePauseString(pause, short = false) {
         const minutes = Math.floor(pause / 60);
         const seconds = pause % 60;
@@ -493,7 +482,7 @@ function getVoices() {
               return 0;
         });
     }
-    console.log(`Found ${VOICES.length} matching voices`) ;
+    console.info(`Found ${VOICES.length} matching voices`) ;
 }
 
 function updateSettingsPage() {
@@ -506,7 +495,7 @@ function updateSettingsPage() {
     while (voice_select.firstChild) {
         voice_select.removeChild(voice_select.firstChild);
     }
-    
+
     for (let i in VOICES) {
         const opt = document.createElement('option');
         opt.setAttribute('value', i);
@@ -570,7 +559,7 @@ function updateMainPage(identifier) {
     while (program_select.firstChild) {
         program_select.removeChild(program_select.firstChild);
     }
-    
+
     // Populate program select options
     let showDefaultProgramsExceptionally = false;
     if (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID] && (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].length > 0)) {
@@ -626,7 +615,7 @@ function updateMainPage(identifier) {
             delete_button.disabled = false;
         }
         showProgramDetails();
-    }
+    };
 
     //  Activate/deactivate buttons and call showProgramDetails()
     program_select.onchange();
@@ -644,7 +633,7 @@ function updateMainPage(identifier) {
         addElement(program_details_header, 'p', program.description.replace(/([^.])$/, '$1.'), {'class': 'program_description'});
         const times = calculateTimes(program);
         addElement(program_details_header, 'p', `Total time: ${Math.floor(times[3] / 60)}:${(times[3] % 60).toString().padStart(2, "0")} min. Hang time: ${Math.floor(times[0] / 60)}:${(times[0] % 60).toString().padStart(2, "0")} min.`, {'class': 'program_times'});
-        
+
         const program_details_exercises = document.getElementById('program_details_exercises');
         while (program_details_exercises.firstChild) {
             program_details_exercises.removeChild(program_details_exercises.firstChild);
@@ -652,7 +641,7 @@ function updateMainPage(identifier) {
 
         for (let exercise_num in program.exercises) {
             const exercise = program.exercises[exercise_num];
-            const pause_div = addElement(program_details_exercises, 'div', `Pause for ${exercise.pause} seconds.`, {'class': 'program_pause'});
+            //const pause_div = addElement(program_details_exercises, 'div', `Pause for ${exercise.pause} seconds.`, {'class': 'program_pause'});
             const div = addElement(program_details_exercises, 'div', null, {'class': 'program_exercise'});
             addElement(div, 'h3', (Number(exercise_num) + 1) + ". " + exercise.title, {'class': 'exercise_title'});
             const outer = addElement(div, 'div', null, {'class': 'board_small_container'});
@@ -662,7 +651,7 @@ function updateMainPage(identifier) {
             addElement(div, 'p', exercise.description.replace(/([^.])$/, '$1.'), {'class': 'exercise_description'});
             addElement(div, 'p', `Hold for ${exercise.hold} seconds. Rest for ${exercise.rest} seconds. Repeat ${exercise.repeat} times.`, {'class': 'exercise_details'});
         }
-        
+
         function addElement(node, type, text, atts) {
             const el = document.createElement(type);
             if (text) {
@@ -675,7 +664,7 @@ function updateMainPage(identifier) {
             node.appendChild(el);
             return el;
         }
-        
+
         function calculateTimes(program) {
             let pause = 0, inter = 0, hold = 0;
             for (let exercise of program.exercises) {
@@ -695,9 +684,9 @@ function updateEditPage(identifier) {
     if (document.getElementById('program_edit')) {
         edit_content.removeChild(document.getElementById('program_edit'));
     }
-    
+
     const placeholder = document.getElementById('edit_placeholder');
-    
+
     const template_edit = document.getElementById('template_edit');
     const fragment = template_edit.content.cloneNode(true);
 
@@ -705,7 +694,6 @@ function updateEditPage(identifier) {
     title.value = program.title;
     title.addEventListener('change', function changedProgramTitle() {
         program.title = this.value;
-        console.log(`Setting programs[${identifier}].title = "${this.value}".`);
         storeProgramsAndSettings();
     });
 
@@ -713,7 +701,6 @@ function updateEditPage(identifier) {
     description.value = program.description;
     description.addEventListener('change', function changedProgramDescription() {
         program.description = this.value;
-        console.log(`Setting programs[${identifier}].description = "${this.value}".`);
         storeProgramsAndSettings();
     });
 
@@ -734,21 +721,21 @@ function updateEditPage(identifier) {
     });
 
     edit_content.insertBefore(fragment, placeholder);
-    
+
     const form = document.getElementById('program_edit');
     const template_edit_exercise = document.getElementById('template_edit_exercise');
-        
+
     for (let exercise_num in program.exercises) {
         const exercise = program.exercises[exercise_num];
-        
+
         const fragment = template_edit_exercise.content.cloneNode(true);
         fragment.querySelectorAll('label').forEach(function(label) {
             label.htmlFor += "_" + exercise_num;
         });
-        
+
         const number = fragment.querySelector('.edit_exercise_number');
         number.innerHTML = 1 + Number(exercise_num);
-        
+
         const pause = fragment.getElementById('edit_exercise_pause');
         pause.value = exercise.pause;
         pause.id += "_" + exercise_num;
@@ -757,16 +744,14 @@ function updateEditPage(identifier) {
                 this.value = 15;
             }
             program.exercises[exercise_num].pause = Number(this.value);
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].pause = ${this.value}.`);
             storeProgramsAndSettings();
         });
-        
+
         const title = fragment.getElementById('edit_exercise_title');
         title.value = exercise.title;
         title.id += "_" + exercise_num;
         title.addEventListener('change', function changeExerciseTitle() {
             program.exercises[exercise_num].title = this.value;
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].title = "${this.value}".`);
             storeProgramsAndSettings();
         });
 
@@ -775,14 +760,13 @@ function updateEditPage(identifier) {
         description.id += "_" + exercise_num;
         description.addEventListener('change', function changeExerciseDescription() {
             program.exercises[exercise_num].description = this.value;
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].description = "${this.value}".`);
             storeProgramsAndSettings();
         });
 
         const img_board = fragment.querySelector('img.board_img');
         const img_left = fragment.querySelector('img.overlay_left');
         const img_right = fragment.querySelector('img.overlay_right');
-        
+
         img_board.src = "images/" + BOARDS[SETTINGS.selectedBoardID].image;
 
         const left = fragment.getElementById('edit_exercise_left');
@@ -799,7 +783,6 @@ function updateEditPage(identifier) {
         left.addEventListener('change', function changeExerciseLeft() {
             program.exercises[exercise_num].left = parseInt(this.value, 10);
             img_left.src = "images/" + BOARDS[SETTINGS.selectedBoardID].left_holds[this.value].image;
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].left = ${this.value} (${this.item(this.selectedIndex).text}).`);
             storeProgramsAndSettings();
         });
 
@@ -817,7 +800,6 @@ function updateEditPage(identifier) {
         right.addEventListener('change', function changeExerciseRight() {
             program.exercises[exercise_num].right = parseInt(this.value, 10);
             img_right.src = "images/" + BOARDS[SETTINGS.selectedBoardID].right_holds[this.value].image;
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].right = ${this.value} (${this.item(this.selectedIndex).text}).`);
             storeProgramsAndSettings();
         });
 
@@ -829,10 +811,9 @@ function updateEditPage(identifier) {
                 this.value = 1;
             }
             program.exercises[exercise_num].hold = Number(this.value);
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].hold = ${this.value}.`);
             storeProgramsAndSettings();
         });
-        
+
         const interr = fragment.getElementById('edit_exercise_rest');
         interr.value = exercise.rest;
         interr.id += "_" + exercise_num;
@@ -841,10 +822,9 @@ function updateEditPage(identifier) {
                 this.value = 1;
             }
             program.exercises[exercise_num].rest = Number(this.value);
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].rest = ${this.value}.`);
             storeProgramsAndSettings();
         });
-        
+
         const repeat = fragment.getElementById('edit_exercise_repeat');
         repeat.value = exercise.repeat;
         repeat.id += "_" + exercise_num;
@@ -853,10 +833,9 @@ function updateEditPage(identifier) {
                 this.value = 1;
             }
             program.exercises[exercise_num].repeat = Number(this.value);
-            console.log(`Setting programs[${identifier}].exercises[${exercise_num}].repeat = ${this.value}.`);
             storeProgramsAndSettings();
         });
-        
+
         const button_add = fragment.querySelector('button[name=add_exercise]');
         button_add.addEventListener("click", async function addExercise() {
             program.exercises.splice(Number(exercise_num) + 1, 0, {
@@ -872,14 +851,14 @@ function updateEditPage(identifier) {
             storeProgramsAndSettings();
             updateEditPage(identifier);
         });
-        
+
         const button_delete = fragment.querySelector('button[name=delete_exercise]');
         button_delete.addEventListener("click", async function deleteExercise() {
             program.exercises.splice(exercise_num, 1);
             storeProgramsAndSettings();
             updateEditPage(identifier);
         });
-        
+
         form.appendChild(fragment);
     }
 }
@@ -890,7 +869,6 @@ function selectBoard(event) {
     });
     event.target.parentElement.classList.add("checked");
     SETTINGS.selectedBoardID = event.target.value;
-    console.log(`Select ${event.target.value}`);
     storeProgramsAndSettings();
 }
 
@@ -902,13 +880,13 @@ async function handleRouting(event) {
     let match = location.hash.match(/[^#]*#?([^_]+)?(_([cd]\d+)){0,1}/);
     const new_page = match[1] || "";
     const new_identifier = match[3] || null;
-    let old_page = "", old_identifier = null;
+    const program = new_identifier ? getProgram(new_identifier) : null;
+    let old_page = "";//, old_identifier = null;
     if (event) {
     match = event.oldURL.match(/[^#]*#?([^_]+)?(_([cd]\d+)){0,1}/);
         old_page = match[1] || "";
-        old_identifier = match[3] || null;
+        //old_identifier = match[3] || null;
     }
-    console.log(`Navigating from ${old_page} to ${new_page}`);
     if (old_page == "run") {
         // TODO: are you sure?
         COUNTER.stop();
@@ -936,7 +914,6 @@ async function handleRouting(event) {
             document.getElementById("edit_content").style.display = "block";
             break;
         case "run":
-            let program = getProgram(new_identifier);
             document.getElementById("toolbar_title").innerText = program.title;
             document.getElementById("toolbar_icon_back").style.display = "inline";
             document.getElementById("run_content").style.display = "block";
@@ -946,7 +923,7 @@ async function handleRouting(event) {
                 history.back();
             }
             catch (err) {
-                console.log(`Program aborted (${err})`);
+                console.warn("Program aborted", err);
             }
             finally {
                 window.plugins.insomnia.allowSleepAgain();
@@ -971,10 +948,11 @@ async function handleRouting(event) {
     }
 }
 
+
 function init() {
     const program_select = document.getElementsByName('program_select')[0];
-    
-    StatusBar.hide();
+
+    window.StatusBar.hide();
 
     loadProgramsAndSettings();
 
@@ -1002,7 +980,6 @@ function init() {
             CUSTOM_PROGRAMS[SETTINGS.selectedBoardID] = [];
         }
         CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].push(clone);
-        console.log(`Cloning program ${clone.title}`)
         storeProgramsAndSettings();
         let new_identifier = "c" + CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].indexOf(clone);
         updateMainPage(new_identifier);
@@ -1014,7 +991,6 @@ function init() {
         const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
         // TODO: confirm
         const num = selected_program_identifier.substr(1);
-        console.log(`Deleting program ${CUSTOM_PROGRAMS[SETTINGS.selectedBoardID][num].title}`)
         CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].splice(num, 1);
         storeProgramsAndSettings();
         updateMainPage('c0');
@@ -1026,16 +1002,16 @@ function init() {
     const pause_button = document.getElementsByName("pause")[0];
     pause_button.addEventListener("click", COUNTER.pause);
 
-	var TouchMenu = TouchMenuLA({
+	var TouchMenu = window.TouchMenuLA({
 		target: document.getElementById('drawer'),
         width: Math.min(Math.min(screen.availWidth, screen.availHeight) - 56, 280),
         zIndex: 2,
         handleSize: 0
 	});
-	document.getElementById('toolbar_icon_menu').addEventListener('click', function(event){
+	document.getElementById('toolbar_icon_menu').addEventListener('click', function() {
 		TouchMenu.toggle();
 	}, false);
-    document.getElementById('a_export_programs').addEventListener('click', function(event){
+    document.getElementById('a_export_programs').addEventListener('click', function(event) {
         event.preventDefault();
         TouchMenu.close();
         exportPrograms();
@@ -1061,7 +1037,7 @@ function init() {
         navigateTo('settings');
 	}, false);
     document.getElementById('drawer').style.display = "block";
-    
+
     // Prepare hangboard selector
     const hs = document.getElementById('hangboard_select');
     hs.onchange = selectBoard;
@@ -1100,16 +1076,15 @@ function init() {
 
 var exportPrograms;
 (function() {
-    var APP = window.hasOwnProperty("_cordovaNative");
-    if ( APP ) {
+    if (window._cordovaNative) {
         exportPrograms = saveProgramsAsFile;
         document.addEventListener('deviceready', function() {
-            console.log('Running as app');
+            console.info('Running as app');
             init();
         }, false);
     }
     else {
-        console.log('Running in browser');
+        console.info('Running in browser');
         exportPrograms = downloadPrograms;
         window.plugins = { insomnia: { keepAwake: function() {}, allowSleepAgain: function() {} } };
         window.StatusBar = { hide: function() {} };
