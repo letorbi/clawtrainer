@@ -130,18 +130,7 @@ function completedSound() {
     }
 }
 
-function downloadPrograms() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(CUSTOM_PROGRAMS, null, "    "));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    const date = new Date();
-    const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
-    downloadAnchorNode.setAttribute("download", filename);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-}
-
-function saveProgramsAsFile() {
+function savePrograms() {
     const date = new Date();
     const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
 
@@ -948,7 +937,6 @@ async function handleRouting(event) {
     }
 }
 
-
 function init() {
     const program_select = document.getElementsByName('program_select')[0];
 
@@ -1014,7 +1002,7 @@ function init() {
     document.getElementById('a_export_programs').addEventListener('click', function(event) {
         event.preventDefault();
         TouchMenu.close();
-        exportPrograms();
+        savePrograms();
 	}, false);
     document.getElementById("a_import_programs").addEventListener("click", function(event) {
         event.preventDefault();
@@ -1074,20 +1062,4 @@ function init() {
     handleRouting();
 }
 
-var exportPrograms;
-(function() {
-    if (window._cordovaNative) {
-        exportPrograms = saveProgramsAsFile;
-        document.addEventListener('deviceready', function() {
-            console.info('Running as app');
-            init();
-        }, false);
-    }
-    else {
-        console.info('Running in browser');
-        exportPrograms = downloadPrograms;
-        window.plugins = { insomnia: { keepAwake: function() {}, allowSleepAgain: function() {} } };
-        window.StatusBar = { hide: function() {} };
-        init();
-    }
-})();
+document.addEventListener('deviceready', init, false);
