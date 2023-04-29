@@ -5,3 +5,8 @@ node_modules/
 .DS_Store
 .sourcemaps
 dist/
+
+resources/android
+resources/blackberry10
+resources/ios
+resources/windows
