@@ -1,30 +1,34 @@
 {
-  "name": "com.letorbi.clawtrainer",
-  "description": "Strong fingers for strong climbing",
+  "name": "capacitor-app",
   "version": "1.0.0",
-  "displayName": "Claw Trainer",
-  "cordova": {
-    "platforms": [
-      "android"
-    ],
-    "plugins": {
-      "phonegap-plugin-speech-synthesis": {},
-      "cordova-plugin-insomnia": {},
-      "cordova-plugin-statusbar": {},
-      "cordova-plugin-file": {
-        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
-      },
-      "cordova-plugin-recentscontrol": {},
-      "cordova-plugin-dialogs": {}
-    }
+  "description": "An Amazing Capacitor App",
+  "main": "index.js",
+  "keywords": [
+    "capacitor",
+    "mobile"
+  ],
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor-community/keep-awake": "^3.0.0",
+    "@capacitor/android": "^4.8.0",
+    "@capacitor/camera": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/splash-screen": "latest",
+    "@capacitor/status-bar": "^4.1.1",
+    "cordova-plugin-file": "^7.0.0",
+    "phonegap-plugin-speech-synthesis": "^0.1.1",
+    "hammerjs": "^2.0.8",
+    "sound": "github:kittykatattack/sound.js",
+    "touch-menu-la": "^0.5.0"
   },
   "devDependencies": {
-    "cordova-android": "^11.0.0",
-    "cordova-plugin-dialogs": "^2.0.2",
-    "cordova-plugin-file": "^7.0.0",
-    "cordova-plugin-insomnia": "^4.3.0",
-    "cordova-plugin-recentscontrol": "^1.1.2",
-    "cordova-plugin-statusbar": "^3.0.0",
-    "phonegap-plugin-speech-synthesis": "github:macdonst/SpeechSynthesisPlugin"
-  }
+    "@capacitor/cli": "latest",
+    "vite": "^2.9.13"
+  },
+  "author": "",
+  "license": "ISC"
 }

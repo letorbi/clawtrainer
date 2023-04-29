@@ -1,0 +1,11 @@
+{
+  "appId": "com.letorbi.clawtrainer",
+  "appName": "Claw Trainer",
+  "bundledWebRuntime": false,
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
