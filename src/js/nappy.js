@@ -143,7 +143,7 @@ function savePrograms() {
     const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
 
     window.resolveLocalFileSystemURL(
-        FilesystemDirectory.Data,
+        "file:///storage/emulated/0/",
         function (dirEntry) {
             dirEntry.getFile(
                 filename,
