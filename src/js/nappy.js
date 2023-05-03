@@ -19,6 +19,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { StatusBar } from "@capacitor/status-bar";
 import { KeepAwake } from "@capacitor-community/keep-awake";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem"; 
 
 import { } from "hammerjs";
 import { } from "touch-menu-la/src/js/touch-menu-la.js";
@@ -138,39 +139,25 @@ function completedSound() {
     }
 }
 
-function savePrograms() {
+async function savePrograms() {
     const date = new Date();
     const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
 
-    window.resolveLocalFileSystemURL(
-        "file:///storage/emulated/0/",
-        function (dirEntry) {
-            dirEntry.getFile(
-                filename,
-                {create: true, exclusive: false},
-                writeFile,
-                handleSaveError
-            );
-        },
-        handleSaveError
-    );
-
-    function writeFile(fileEntry) {
-        fileEntry.createWriter(function (fileWriter) {
-            fileWriter.onwriteend = function() {
-                navigator.notification.alert(
-                    `Exported custom programs as '${filename}'.`,
-                    null,
-                    'Export successful',
-                    'OK'
-                );
-            };
-            fileWriter.onerror = handleSaveError;
-            fileWriter.write(JSON.stringify(CUSTOM_PROGRAMS, null, "    "));
+    try {
+        await Filesystem.writeFile({
+            path: filename,
+            data: JSON.stringify(CUSTOM_PROGRAMS, null, "    "),
+            directory: Directory.ExternalStorage,
+            encoding: Encoding.UTF8,
         });
+        navigator.notification.alert(
+            `Exported custom programs as '${filename}'.`,
+            null,
+            'Export successful',
+            'OK'
+        );
     }
-
-    function handleSaveError(e)  {
+    catch (e) {
         navigator.notification.alert(
             `Export failed (error code: ${e.code}).`,
             null,

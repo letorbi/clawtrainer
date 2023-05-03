@@ -11,9 +11,10 @@ apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
     implementation project(':capacitor-community-keep-awake')
     implementation project(':capacitor-camera')
+    implementation project(':capacitor-filesystem')
     implementation project(':capacitor-splash-screen')
     implementation project(':capacitor-status-bar')
-    implementation "androidx.webkit:webkit:1.4.0"
+
 }
 
 
