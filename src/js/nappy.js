@@ -19,7 +19,8 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { StatusBar } from "@capacitor/status-bar";
 import { KeepAwake } from "@capacitor-community/keep-awake";
-import { Filesystem, Directory, Encoding } from "@capacitor/filesystem"; 
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import { Dialog } from '@capacitor/dialog';
 
 import { } from "hammerjs";
 import { } from "touch-menu-la/src/js/touch-menu-la.js";
@@ -150,20 +151,16 @@ async function savePrograms() {
             directory: Directory.ExternalStorage,
             encoding: Encoding.UTF8,
         });
-        navigator.notification.alert(
-            `Exported custom programs as '${filename}'.`,
-            null,
-            'Export successful',
-            'OK'
-        );
+        await Dialog.alert({
+            title: "Export successful",
+            message: `Exported custom programs as '${filename}'.`
+        });
     }
     catch (e) {
-        navigator.notification.alert(
-            `Export failed (error code: ${e.code}).`,
-            null,
-            'Export failed',
-            'OK'
-        );
+        await Dialog.alert({
+            title: 'Export failed',
+            message: `Export failed (error code: ${e.code}).`
+        });
     }
 }
 
@@ -175,24 +172,18 @@ function uploadPrograms(files) {
     const file = files[0];
     const reader = new FileReader();
     document.getElementById("fileElem").value = "";
-    reader.onload = function(event) {
+    reader.onload = async function(event) {
         try {
             const ct = JSON.parse(event.target.result);
             if (ct.version == DEFAULT_PROGRAMS.version) {
                 if (countPrograms(CUSTOM_PROGRAMS) > 0) {
-                    navigator.notification.confirm(
-                        `Do you want to overwrite your ${countPrograms(CUSTOM_PROGRAMS)} custom programs with ${countPrograms(ct)} programs from file '${file.name}'?`,
-                        function confirmImport(buttonIndex) {
-                            if (buttonIndex == 1) {
-                                doImport(ct);
-                            }
-                        },
-                        'Import programs',
-                        null
-                    );
-                }
-                else {
-                    doImport(ct);
+                    const { value } = await Dialog.confirm({
+                        title: 'Import programs',
+                        message: `Do you want to overwrite your ${countPrograms(CUSTOM_PROGRAMS)} custom programs with ${countPrograms(ct)} programs from file '${file.name}'?`
+                    });
+                    if (value) {
+                        doImport(ct);
+                    }
                 }
             }
         }
@@ -353,12 +344,10 @@ async function runProgram(board, program) {
         await runExercise(exercise);
     }
     speak("Congratulations!");
-    navigator.notification.alert(
-        `You have completed program ${program.title}!`,
-        null,
-        'Congratulations',
-        'OK'
-    );
+    await Dialog.alert({
+        title: 'Congratulations',
+        message: `You have completed program ${program.title}!`
+    });
 
     async function runExercise(exercise) {
         pause_pbar.style.display = "none";
