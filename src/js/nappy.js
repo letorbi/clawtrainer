@@ -21,6 +21,7 @@ import { StatusBar } from "@capacitor/status-bar";
 import { KeepAwake } from "@capacitor-community/keep-awake";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Dialog } from '@capacitor/dialog';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
 import { } from "hammerjs";
 import { } from "touch-menu-la/src/js/touch-menu-la.js";
@@ -216,7 +217,7 @@ function storeProgramsAndSettings() {
     window.localStorage.setItem('programs', JSON.stringify(CUSTOM_PROGRAMS));
 }
 
-function loadProgramsAndSettings() {
+async function loadProgramsAndSettings() {
     if (window.localStorage.getItem('settings')) {
         let loaded_settings = JSON.parse(window.localStorage.getItem('settings'));
         SETTINGS = DEFAULT_SETTINGS;
@@ -236,7 +237,7 @@ function loadProgramsAndSettings() {
 
     if (SETTINGS.voice === undefined) {
         console.warn('No voice selected. Selecting first system voice if available.');
-        getVoices();
+        await getVoices();
         if (VOICES[0] !== undefined) {
             SETTINGS.voice = VOICES[0].voiceURI;
         }
@@ -255,10 +256,10 @@ function loadProgramsAndSettings() {
     }
 }
 
-function speak(message) {
+async function speak(message) {
     if (SETTINGS['speechOutput'] && SETTINGS.voice) {
         if (VOICES.length < 1) {
-            getVoices();
+            await getVoices();
         }
         let selected_voice;
         for (let i in VOICES) {
@@ -267,12 +268,16 @@ function speak(message) {
                 break;
             }
         }
-        const utterance = new SpeechSynthesisUtterance();
-        utterance.text = message;
-        utterance.lang = 'en-US';
-        utterance.voice = selected_voice;
         console.info(`Speaking "${message}"`);
-        speechSynthesis.speak(utterance);
+        await TextToSpeech.speak({
+            text: message,
+            lang: 'en-US',
+            rate: 1.0,
+            pitch: 1.0,
+            volume: 1.0,
+            voice: selected_voice,
+            category: 'ambient',
+        });
     }
     else {
         console.warn(`Not speaking: "${message}"`);
@@ -434,9 +439,9 @@ function getProgram(identifier) {
     return program;
 }
 
-function getVoices() {
+async function getVoices() {
     VOICES = [];
-    let voices = speechSynthesis.getVoices();
+    const { voices } = await TextToSpeech.getSupportedVoices();
     if (voices !== null) {
         for (let i = 0; i < voices.length ; i++) {
             let v = Array.isArray(voices) ? voices[i] : voices.item(i);
@@ -458,9 +463,9 @@ function getVoices() {
     console.info(`Found ${VOICES.length} matching voices`) ;
 }
 
-function updateSettingsPage() {
+async function updateSettingsPage() {
     if (VOICES.length < 1) {
-        getVoices();
+        await getVoices();
     }
 
     const voice_select = document.getElementById('select_voice');
@@ -913,7 +918,7 @@ async function handleRouting(event) {
             document.getElementById("hangboard_selector_content").style.display = "block";
             break;
         case "settings":
-            updateSettingsPage();
+            await updateSettingsPage();
             document.getElementById("toolbar_title").innerText = "Settings";
             document.getElementById("toolbar_icon_back").style.display = "inline";
             document.getElementById("settings_content").style.display = "block";
@@ -921,12 +926,12 @@ async function handleRouting(event) {
     }
 }
 
-function init() {
+async function init() {
     const program_select = document.getElementsByName('program_select')[0];
 
     StatusBar.hide();
 
-    loadProgramsAndSettings();
+    await loadProgramsAndSettings();
 
     window.addEventListener('hashchange', handleRouting);
 
@@ -1040,8 +1045,6 @@ function init() {
         div.appendChild(label);
         hs.appendChild(div);
     }
-
-    speechSynthesis.onvoiceschanged = updateSettingsPage;
 
     handleRouting();
 }
