@@ -440,27 +440,34 @@ function getProgram(identifier) {
 }
 
 async function getVoices() {
-    VOICES = [];
-    const { voices } = await TextToSpeech.getSupportedVoices();
-    if (voices !== null) {
-        for (let i = 0; i < voices.length ; i++) {
-            let v = Array.isArray(voices) ? voices[i] : voices.item(i);
-            if ((v.lang.startsWith('en')) && (v.localService === true)) {
-                // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
-                VOICES.push(v);
+    try {
+        console.log("getVoices");
+        VOICES = [];
+        const { voices } = await TextToSpeech.getSupportedVoices();
+        console.log(voices);
+        if (voices !== null) {
+            for (let i = 0; i < voices.length ; i++) {
+                let v = Array.isArray(voices) ? voices[i] : voices.item(i);
+                if ((v.lang.startsWith('en')) && (v.localService === true)) {
+                    // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
+                    VOICES.push(v);
+                }
             }
+            VOICES.sort(function(a,b) {
+                if (a.lang > b.lang) {
+                    return 1;
+                  }
+                  if (a.lang < b.lang) {
+                    return -1;
+                  }
+                  return 0;
+            });
         }
-        VOICES.sort(function(a,b) {
-            if (a.lang > b.lang) {
-                return 1;
-              }
-              if (a.lang < b.lang) {
-                return -1;
-              }
-              return 0;
-        });
+        console.info(`Found ${VOICES.length} matching voices`) ;
     }
-    console.info(`Found ${VOICES.length} matching voices`) ;
+    catch (err) {
+        console.error("Error while getting voices", err);
+    }
 }
 
 async function updateSettingsPage() {
