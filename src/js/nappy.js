@@ -22,6 +22,7 @@ import { KeepAwake } from "@capacitor-community/keep-awake";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Dialog } from '@capacitor/dialog';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 import { } from "hammerjs";
 import { } from "touch-menu-la/src/js/touch-menu-la.js";
@@ -158,41 +159,46 @@ async function savePrograms() {
         });
     }
     catch (e) {
+        console.error("Export failed", e);
         await Dialog.alert({
             title: 'Export failed',
-            message: `Export failed (error code: ${e.code}).`
+            message: e.messsage
         });
     }
 }
 
-document.getElementById("fileElem").onchange  = function() {
-    uploadPrograms(this.files);
-};
-
-function uploadPrograms(files) {
-    const file = files[0];
-    const reader = new FileReader();
-    document.getElementById("fileElem").value = "";
-    reader.onload = async function(event) {
-        try {
-            const ct = JSON.parse(event.target.result);
-            if (ct.version == DEFAULT_PROGRAMS.version) {
-                if (countPrograms(CUSTOM_PROGRAMS) > 0) {
-                    const { value } = await Dialog.confirm({
-                        title: 'Import programs',
-                        message: `Do you want to overwrite your ${countPrograms(CUSTOM_PROGRAMS)} custom programs with ${countPrograms(ct)} programs from file '${file.name}'?`
-                    });
-                    if (value) {
-                        doImport(ct);
-                    }
+async function uploadPrograms() {
+    const file = (await FilePicker.pickFiles({readData: true})).files[0];
+    try {
+        const ct = JSON.parse(atob(file.data));
+        if (ct.version == DEFAULT_PROGRAMS.version) {
+            if (countPrograms(CUSTOM_PROGRAMS) > 0) {
+                const { value } = await Dialog.confirm({
+                    title: 'Import programs',
+                    message: `Do you want to overwrite your ${countPrograms(CUSTOM_PROGRAMS)} custom programs with ${countPrograms(ct)} programs from file '${file.name}'?`
+                });
+                if (value) {
+                    doImport(ct);
                 }
             }
+            else {
+                doImport(ct);
+            }
         }
-        catch(error) {
-            console.error(error);
+        else {
+            await Dialog.alert({
+                title: 'Import failed',
+                message: `Version of imported programs (${ct.version}) does not match app version (${DEFAULT_PROGRAMS.version}).`
+            });
         }
-    };
-    reader.readAsText(file);
+    }
+    catch(e) {
+        console.error("Import failed", e);
+        await Dialog.alert({
+            title: 'Import failed',
+            message: e.message
+        });
+    }
 
     function doImport(ct) {
         CUSTOM_PROGRAMS = ct;
@@ -1003,7 +1009,7 @@ async function init() {
     document.getElementById("a_import_programs").addEventListener("click", function(event) {
         event.preventDefault();
         TouchMenu.close();
-        document.getElementById("fileElem").click();
+        uploadPrograms();
     }, false);
     document.getElementById('a_about').addEventListener('click', function(event){
         event.preventDefault();
