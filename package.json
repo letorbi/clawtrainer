@@ -1,0 +1,37 @@
+{
+  "name": "capacitor-app",
+  "version": "1.0.0",
+  "description": "An Amazing Capacitor App",
+  "main": "index.js",
+  "keywords": [
+    "capacitor",
+    "mobile"
+  ],
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor-community/keep-awake": "^3.0.0",
+    "@capacitor-community/text-to-speech": "^2.1.0",
+    "@capacitor/android": "^4.8.0",
+    "@capacitor/camera": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/dialog": "^4.1.0",
+    "@capacitor/filesystem": "^4.1.4",
+    "@capacitor/splash-screen": "latest",
+    "@capacitor/status-bar": "^4.1.1",
+    "@capawesome/capacitor-file-picker": "^0.6.3",
+    "hammerjs": "^2.0.8",
+    "sound": "github:kittykatattack/sound.js",
+    "touch-menu-la": "^0.5.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "capacitor-resources": "^2.0.5",
+    "vite": "^2.9.13"
+  },
+  "author": "",
+  "license": "ISC"
+}

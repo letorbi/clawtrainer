@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<!--
+This file is part of Claw Trainer.
+
+Copyright (c) 2017-2021 Daniel Schroer
+Copyright (c) 2021-2023 Daniel Schroer & contributors
+Copyright (c) 2023 Torben Haase & contributors
+
+Claw Trainer is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+Claw Trainer is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Claw Trainer</title>
+        <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+
+        <link rel="icon" type="image/x-icon" href="./assets/icon/favicon.ico" />
+        <link rel="manifest" href="./manifest.json" />
+        <link rel="stylesheet" href="./css/nappy.css" />
+    </head>
+    <body>
+        <h1 class="toolbar"><span id="toolbar_icon_menu"><i class="material-icons md-dark">menu</i></span><a href="#" id="toolbar_icon_back" onclick="window.history.back();return false"><i class="material-icons md-dark">arrow_back</i></a><span id="toolbar_title">Claw Trainer</span></h1>
+        <div id="content">
+            <div id="main_content">
+                <select class="big_select" name="program_select"></select>
+                <div id="program_details_header"></div>
+                <div class="button_container">
+                    <button class="button_flat" name="clone">Clone</button>
+                    <button class="button_flat" name="edit">Edit</button>
+                    <button class="button_flat" name="delete">Delete</button>
+                </div>
+                <div id="program_details_exercises"></div>
+                <button class="button_round" name="start"><i class="material-icons md-light md-36">play_arrow</i></button>
+            </div>
+            <div id="run_content">
+                <div class="board_outer_container">
+                    <div class="board_inner_container">
+                        <img class="board_img" src="" alt=""/>
+                        <img class="overlay_img overlay_left" src="" alt=""/>
+                        <img class="overlay_img overlay_right" src="" alt=""/>
+                    </div>
+                </div>
+                <h2 id="exercise_title"></h2>
+                <p id="exercise_description"></p>
+                <div id="counter"><span id="exercise_counter"></span><span id="time_counter"></span><span id="repeat_counter"></span></div>
+                <div id="pbars">
+                    <progress id="hold_pbar" max="7" value="0"></progress><progress id="rest_pbar" max="3" value="0"></progress>
+                    <progress id="pause_pbar" max="7" value="0"></progress>
+                </div>
+                <!--<div id="pause_overlay"><i class="material-icons md-dark md-288">pause_circle_outline</i></div>-->
+                <button class="button_wide" name="pause"><i class="material-icons md-dark">pause</i>Suspend</button>
+            </div>
+            <div id="edit_content">
+                <template id="template_edit">
+                    <form id="program_edit" onsubmit="return false;">
+                        <div class="edit_header">
+                            <label for="edit_program_title" class="edit-label edit-row1">Title</label>
+                            <input id="edit_program_title" class="edit-input edit-row1" type="text" />
+
+                            <label for="edit_program_description" class="edit-label edit-row2">Description</label>
+                            <textarea id="edit_program_description" class="edit-input edit-row2"></textarea>
+                        </div>
+                        <button class="button_wide button_add" name="add_exercise"><i class="material-icons md-dark">add</i>Add Exercise</button>
+                    </form>
+                </template>
+                <template id="template_edit_exercise">
+                    <div class="edit_pause">
+                        <label for="edit_exercise_pause" class="edit-label edit-row1">Pause</label>
+                        <input id="edit_exercise_pause" class="edit-input edit-row1" type="number" step="1" min="15"/>
+                        <label for="edit_exercise_pause" class="edit-label-right edit-row1">s</label>
+                    </div>
+
+                    <div class="edit_exercise">
+                        <div class="edit_exercise_number edit-label edit-row1"></div>
+                        <div class="board_inner_container edit-input-big edit-row1">
+                            <img class="board_img" src="" alt="">
+                            <img class="overlay_img overlay_left" src="" alt="">
+                            <img class="overlay_img overlay_right" src="" alt="">
+                        </div>
+
+                        <label for="edit_exercise_title" class="edit-label edit-row2">Title</label>
+                        <input id="edit_exercise_title" class="edit-input-big edit-row2" type="text"/>
+
+                        <label for="edit_exercise_description" class="edit-label edit-row3">Description</label>
+                        <textarea id="edit_exercise_description" class="edit-input-big edit-row3"></textarea>
+
+                        <label for="edit_exercise_left" class="edit-label edit-row4">Left hand</label>
+                        <select id="edit_exercise_left" class="edit-input-big edit-row4"></select>
+
+                        <label for="edit_exercise_right" class="edit-label edit-row5">Right hand</label>
+                        <select id="edit_exercise_right" class="edit-input-big edit-row5"></select>
+
+                        <label for="edit_exercise_hold" class="edit-label edit-row6">Hold</label>
+                        <input id="edit_exercise_hold" class="edit-input edit-row6" type="number" min="1" step="1"/>
+                        <label for="edit_exercise_hold" class="edit-label-right edit-row6">s</label>
+
+                        <label for="edit_exercise_rest" class="edit-label edit-row7">Rest</label>
+                        <input id="edit_exercise_rest" class="edit-input edit-row7" type="number" min="1" step="1"/>
+                        <label for="edit_exercise_rest" class="edit-label-right edit-row7">s</label>
+
+                        <label for="edit_exercise_repeat" class="edit-label edit-row8">Repeat</label>
+                        <input id="edit_exercise_repeat" class="edit-input edit-row8" type="number" min="1" step="1"/>
+                        <label for="edit_exercise_repeat" class="edit-label-right edit-row8">times</label>
+
+                        <button name="delete_exercise" class="edit-span edit-row9 button_wide button_delete"><i class="material-icons md-dark">delete</i>Delete Exercise</button>
+                    </div>
+
+                    <button class="button_add button_wide" name="add_exercise"><i class="material-icons md-dark">add</i>Add Exercise</button>
+                </template>
+            </div>
+            <div id="about_content">
+                <h2>Claw Trainer</h2>
+                <p>Claw Trainer is licensed as open-source under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">the GPL version 3</a>.</p>
+                <p><a href="https://github.com/letorbi/clawtrainer/">See the source code and report issues on GitHub.</a></p>
+                <p>Copyright (c) 2017-2020 Daniel Schroer<br>
+                Copyright (c) 2020-2023 Daniel Schroer & contributors<br>
+                Copyright (c) 2023 Torben Haase & contributors</p>
+                <h3>Splash screen</h3>
+                <p>Photo by <a href="https://unsplash.com/@speckfechta">x )</a> on <a href="https://unsplash.com/photos/N4QTBfNQ8Nk">Unsplash</a></p>
+            </div>
+            <div id="hangboard_selector_content">
+                <form id="hangboard_select" onsubmit="return false;"></form>
+            </div>
+            <div id="settings_content">
+                <form id="form_settings" onsubmit="return false;">
+                    <ul>
+                        <li>
+                            <i class="material-icons md-dark">visibility</i>
+                            <label for="checkbox_showDefaultPrograms">Show built-in programs</label>
+                            <div class="matbox">
+                                <input id="checkbox_showDefaultPrograms" type="checkbox" />
+                                <label for="checkbox_showDefaultPrograms"></label>
+                            </div>
+                        </li>
+
+                        <li>
+                            <i class="material-icons md-dark">notifications</i>
+                            <label for="checkbox_soundOutput">Play sounds</label>
+                            <div class="matbox">
+                                <input id="checkbox_soundOutput" type="checkbox" />
+                                <label for="checkbox_soundOutput"></label>
+                            </div>
+                        </li>
+
+                        <li>
+                            <i class="material-icons md-dark">record_voice_over</i>
+                            <label for="checkbox_speechOutput">Speak instructions</label>
+                            <div class="matbox">
+                                <input id="checkbox_speechOutput" type="checkbox" />
+                                <label for="checkbox_speechOutput"></label>
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="selbox">
+                                <label for="select_voice">Voice</label>
+                                <select id="select_voice"></select>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+           </div>
+        </div>
+        <div id="drawer" class="touch-menu-la">
+            <header class="drawer-header"><div class="drawer-header-content"></div></header>
+            <div class="menu-items">
+                <a id="a_switch_board" href="#"><i class="material-icons md-dark">fitness_center</i>Switch hangboard</a>
+                <hr/>
+                <a id="a_export_programs" href="#"><i class="material-icons md-dark">file_download</i>Export custom programs</a>
+                <a id="a_import_programs" href="#"><i class="material-icons md-dark">file_upload</i>Import custom programs</a>
+                <hr/>
+                <a id="a_settings" href="#"><i class="material-icons md-dark">settings</i>Settings</a>
+                <a id="a_about" href="#"><i class="material-icons md-dark">info</i>About</a>
+            </div>
+        </div>
+        <script type="module" src="./js/nappy.js"></script>
+    </body>
+</html>
