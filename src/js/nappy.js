@@ -25,7 +25,7 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 import { } from "hammerjs";
-import { } from "touch-menu-la/src/js/touch-menu-la.js";
+import { } from "touch-menu-la";
 
 import { soundEffect }  from "sound";
 

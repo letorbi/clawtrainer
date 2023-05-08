@@ -25,7 +25,7 @@
     "@capawesome/capacitor-file-picker": "^0.6.3",
     "hammerjs": "^2.0.8",
     "sound": "github:kittykatattack/sound.js",
-    "touch-menu-la": "^0.5.0"
+    "touch-menu-la": "github:letorbi/Touch-Menu-Like-Android"
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
