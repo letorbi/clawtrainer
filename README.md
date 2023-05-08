@@ -2,7 +2,7 @@
 
 Finger strength is important for hard climbing. Hangboards (fingerboards) are the most effective way to improve finger strength. This app supports you in your training on *Beastmaker 1000*, *Beastmaker 2000* and *Smartrock Griptonite* hangboards. Other hangboards will be supported eventually.
 
-Claw Trainer is mainly an Android app, but other platforms supported by [Apache Cordova](https://cordova.apache.org/) might work as well. It is licensed as open-source under the GPL version 3.
+Claw Trainer is mainly an Android app, but other platforms supported by [Capacitor](https://capacitorjs.com/ ) might work as well. It is licensed as open-source under the GPL version 3.
 
 ## Features
 
@@ -16,18 +16,33 @@ Claw Trainer is mainly an Android app, but other platforms supported by [Apache 
 
 ## Building
 
-Claw Trainer uses Apache Cordova to run as a native app, so please make sure that Cordova and its dependencies (Java 8, Gradle) are installed properly. Android Studio should be installed as well.
+To run Claw Trainer you should have at least Node.js and NPM installed. You will also need Android Studio, if you want to build the app for Android.
 
-Once all build-tools are installed, only the following commands are required to build the Android app:
+### Testing in browser
+
+Run the following commands to install Capacitor and start a HTTP server that provides the app:
 
 ```
-$ cordova platform add android
-$ cordova build android
+npm install
+npm start
 ```
 
-This will create an Android Studio project in the subfolder *platforms/android*. The command `cordova run android --emulator` can be used, to start the app directly in an emulated Android device.
+You can then access the app in you browser by opening the URL `http://localhost:3000`.
 
-Even though Cordova also supports iOS or other plattforms, Claw Trainer is currently only tested on Android. Feel free to try other platforms, but your mileage may vary.
+While running the app in the browser is handy during development, it is not the recommended way to use the app for end-users.
+
+### Android app
+
+Once the app runs in the browser, you can use the following commands to create the Android app:
+
+```
+npx capacitor-resources -t cover -p android
+npm run build
+npx cap sync android
+npx cap open android
+```
+
+The last command will open the Android Studio project for the app. You can then use Android Studio to test Claw Trainer in an emulator or to deploy the app.
 
 ## Training methods
 
