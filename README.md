@@ -27,7 +27,7 @@ npm install
 npm start
 ```
 
-You can then access the app in you browser by opening the URL `http://localhost:3000`.
+You can then access the app in your browser by opening the URL `http://localhost:3000`.
 
 While running the app in the browser is handy during development, it is not the recommended way to use the app for end-users.
 
@@ -46,6 +46,8 @@ The last command will open the Android Studio project for the app. You can then 
 
 ## Training methods
 
+Claw Trainer is useful for all typical training methods and comes with a number of built-in programs. The app will guide you through the programs with detailed instructions, using spoken language, pictures and descriptive texts.
+
 ### Hangboard repeaters
 
 Training on hangboards means executing sets of short hangs with short rests in between. A set may consist of six hangs of seven seconds each, for example, seperated by rests of three seconds each. All six repeats are done on the same holds with the same grip type (finger position). Such a set is called an *exercise* is Claw Trainer. After the exercise, you take a rest for some minutes. Then you move on to the next exercise on other holds. A complete workout of several exercises is called a *program* in Claw Trainer.
@@ -58,11 +60,9 @@ An alternative method is to hang for longer times of ten or twelve seconds. Hold
 
 The maximum hangs method mostly improves maximum strength.
 
-### Smart beastmaking
+### Custom programs
 
-Claw Trainer is useful for both methods and comes with a number of built-in programs for both methods. Claw Trainer guides you through these programs with detailed instructions, using spoken language, pictures and descriptive texts.
-
-An integrated editor allows to modify these programs and to create new custom programs according to your own preferences. There is an option for exporting and importing custom programs as JSON files. These files can be edited with a normal text editor and can easily be shared with other people.
+An integrated editor allows to modify existing programs and to create new custom programs according to your own preferences. There is an option for exporting and importing custom programs as JSON files. These files can be edited with a normal text editor and can easily be shared with other people.
 
 ## Contributions
 
