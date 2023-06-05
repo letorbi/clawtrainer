@@ -11,7 +11,6 @@ apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
     implementation project(':capacitor-community-keep-awake')
     implementation project(':capacitor-community-text-to-speech')
-    implementation project(':capacitor-camera')
     implementation project(':capacitor-dialog')
     implementation project(':capacitor-filesystem')
     implementation project(':capacitor-splash-screen')

@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
+//import { } from "@ionic/core";
+
 import { StatusBar } from "@capacitor/status-bar";
 import { KeepAwake } from "@capacitor-community/keep-awake";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
@@ -24,8 +26,8 @@ import { Dialog } from '@capacitor/dialog';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 
-import { } from "hammerjs";
-import { } from "touch-menu-la";
+//import { } from "hammerjs";
+//import { } from "touch-menu-la";
 
 import { soundEffect }  from "sound";
 
@@ -142,7 +144,7 @@ function completedSound() {
     }
 }
 
-async function savePrograms() {
+export async function savePrograms() {
     const date = new Date();
     const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
 
@@ -167,7 +169,7 @@ async function savePrograms() {
     }
 }
 
-async function uploadPrograms() {
+export async function uploadPrograms() {
     const file = (await FilePicker.pickFiles({readData: true})).files[0];
     try {
         const ct = JSON.parse(atob(file.data));
@@ -476,7 +478,7 @@ async function getVoices() {
     }
 }
 
-async function updateSettingsPage() {
+export async function updateSettingsPage() {
     if (VOICES.length < 1) {
         await getVoices();
     }
@@ -535,7 +537,7 @@ async function updateSettingsPage() {
     };
 }
 
-function updateMainPage(identifier) {
+export function updateMainPage(identifier) {
     const program_select = document.getElementsByName('program_select')[0];
 
     let selected_program_identifier = (typeof identifier !== 'undefined')
@@ -666,9 +668,23 @@ function updateMainPage(identifier) {
             return [hold, inter, pause, hold + inter + pause];
         }
     }
+
+    document.getElementById('ExportButton').addEventListener('click', function() {
+        document.getElementById("MainMenu").close();
+        savePrograms();
+    }, false);
+    document.getElementById("ImportButton").addEventListener("click", function() {
+        document.getElementById("MainMenu").close();
+        uploadPrograms();
+    }, false);
 }
 
-function updateEditPage(identifier) {
+function getProgramIdentifier() {
+    return location.hash.split('/')[2];
+}
+
+export function updateEditPage() {
+    const identifier = getProgramIdentifier();
     const program = getProgram(identifier);
 
     const edit_content = document.getElementById('edit_content');
@@ -864,100 +880,42 @@ function selectBoard(event) {
 }
 
 function navigateTo(page) {
-    window.location.hash = page;
+    window.location.hash = `/${page}`;
 }
 
-async function handleRouting(event) {
-    let match = location.hash.match(/[^#]*#?([^_]+)?(_([cd]\d+)){0,1}/);
-    const new_page = match[1] || "";
-    const new_identifier = match[3] || null;
-    const program = new_identifier ? getProgram(new_identifier) : null;
-    let old_page = "";//, old_identifier = null;
-    if (event) {
-    match = event.oldURL.match(/[^#]*#?([^_]+)?(_([cd]\d+)){0,1}/);
-        old_page = match[1] || "";
-        //old_identifier = match[3] || null;
+export async function updateRunPage() {
+    const identifier = getProgramIdentifier();
+    const program = getProgram(identifier);
+    try {
+        KeepAwake.keepAwake();
+        await runProgram(BOARDS[SETTINGS.selectedBoardID], program);
+        history.back();
     }
-    if (old_page == "run") {
-        // TODO: are you sure?
-        COUNTER.stop();
+    catch (err) {
+        console.warn("Program aborted", err);
     }
-    window.scrollTo(0,0);
-    document.getElementById("toolbar_icon_back").style.display = "none";
-    document.getElementById("toolbar_icon_menu").style.display = "none";
-    document.getElementById("main_content").style.display = "none";
-    document.getElementById("run_content").style.display = "none";
-    document.getElementById("edit_content").style.display = "none";
-    document.getElementById("about_content").style.display = "none";
-    document.getElementById("hangboard_selector_content").style.display = "none";
-    document.getElementById("settings_content").style.display = "none";
-    switch (new_page) {
-        case "":
-            updateMainPage();
-            document.getElementById("toolbar_title").innerText = "Claw Trainer";
-            document.getElementById("toolbar_icon_menu").style.display = "inline";
-            document.getElementById("main_content").style.display = "block";
-            break;
-        case "edit":
-            updateEditPage(new_identifier);
-            document.getElementById("toolbar_title").innerText = getProgram(new_identifier).title;
-            document.getElementById("toolbar_icon_back").style.display = "inline";
-            document.getElementById("edit_content").style.display = "block";
-            break;
-        case "run":
-            document.getElementById("toolbar_title").innerText = program.title;
-            document.getElementById("toolbar_icon_back").style.display = "inline";
-            document.getElementById("run_content").style.display = "block";
-            try {
-                KeepAwake.keepAwake();
-                await runProgram(BOARDS[SETTINGS.selectedBoardID], program);
-                history.back();
-            }
-            catch (err) {
-                console.warn("Program aborted", err);
-            }
-            finally {
-                KeepAwake.allowSleep();
-            }
-            break;
-        case "about":
-            document.getElementById("toolbar_title").innerText = "About";
-            document.getElementById("toolbar_icon_back").style.display = "inline";
-            document.getElementById("about_content").style.display = "block";
-            break;
-        case "switch":
-            document.getElementById("toolbar_title").innerText = "Hangboard";
-            document.getElementById("toolbar_icon_back").style.display = "inline";
-            document.getElementById("hangboard_selector_content").style.display = "block";
-            break;
-        case "settings":
-            await updateSettingsPage();
-            document.getElementById("toolbar_title").innerText = "Settings";
-            document.getElementById("toolbar_icon_back").style.display = "inline";
-            document.getElementById("settings_content").style.display = "block";
-            break;
+    finally {
+        KeepAwake.allowSleep();
     }
 }
 
-async function init() {
+export async function initMain() {
     const program_select = document.getElementsByName('program_select')[0];
 
     StatusBar.hide();
 
     await loadProgramsAndSettings();
 
-    window.addEventListener('hashchange', handleRouting);
-
     const start_button = document.getElementsByName('start')[0];
     start_button.addEventListener("click", function startProgram() {
         const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
-        navigateTo("run_" + selected_program_identifier);
+        navigateTo("run/" + selected_program_identifier);
     });
 
     const edit_button = document.getElementsByName('edit')[0];
     edit_button.addEventListener("click", function editProgram() {
         const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
-        navigateTo(`edit_${selected_program_identifier}`);
+        navigateTo(`edit/${selected_program_identifier}`);
     });
 
     const clone_button = document.getElementsByName('clone')[0];
@@ -988,46 +946,14 @@ async function init() {
         // TODO: else cannot delete last program
         // TODO: delete button disablen
     });
+}
 
+export async function initRun() {
     const pause_button = document.getElementsByName("pause")[0];
     pause_button.addEventListener("click", COUNTER.pause);
+}
 
-	var TouchMenu = window.TouchMenuLA({
-		target: document.getElementById('drawer'),
-        width: Math.min(Math.min(screen.availWidth, screen.availHeight) - 56, 280),
-        zIndex: 2,
-        handleSize: 0
-	});
-	document.getElementById('toolbar_icon_menu').addEventListener('click', function() {
-		TouchMenu.toggle();
-	}, false);
-    document.getElementById('a_export_programs').addEventListener('click', function(event) {
-        event.preventDefault();
-        TouchMenu.close();
-        savePrograms();
-	}, false);
-    document.getElementById("a_import_programs").addEventListener("click", function(event) {
-        event.preventDefault();
-        TouchMenu.close();
-        uploadPrograms();
-    }, false);
-    document.getElementById('a_about').addEventListener('click', function(event){
-        event.preventDefault();
-        TouchMenu.close();
-        navigateTo('about');
-    }, false);
-    document.getElementById('a_switch_board').addEventListener('click', function(event){
-        event.preventDefault();
-        TouchMenu.close();
-        navigateTo('switch');
-	}, false);
-    document.getElementById('a_settings').addEventListener('click', function(event){
-        event.preventDefault();
-        TouchMenu.close();
-        navigateTo('settings');
-	}, false);
-    document.getElementById('drawer').style.display = "block";
-
+export async function initSelect() {
     // Prepare hangboard selector
     const hs = document.getElementById('hangboard_select');
     hs.onchange = selectBoard;
@@ -1058,8 +984,4 @@ async function init() {
         div.appendChild(label);
         hs.appendChild(div);
     }
-
-    handleRouting();
 }
-
-init();
