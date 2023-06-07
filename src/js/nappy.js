@@ -17,35 +17,17 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-//import { } from "@ionic/core";
-
 import { StatusBar } from "@capacitor/status-bar";
 import { KeepAwake } from "@capacitor-community/keep-awake";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Dialog } from '@capacitor/dialog';
-import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 
-//import { } from "hammerjs";
-//import { } from "touch-menu-la";
-
-import { soundEffect }  from "sound";
-
 import {BOARDS} from "./boards.js";
-import {DEFAULT_PROGRAMS} from "./programs.js";
-
-var DEFAULT_SETTINGS = {
-    'version': 4,
-    'selectedBoardID': "bm1000",
-    'showDefaultPrograms': true,
-    'speechOutput': true,
-    'soundOutput': true,
-    'voice':    undefined
-};
-
-var SETTINGS, CUSTOM_PROGRAMS = {};
-
-var VOICES = [];
+import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, loadPrograms, storePrograms} from "./programs.js";
+import {SETTINGS, loadSettings, storeSettings} from "./settings.js";
+import {ticSound, goSound, completedSound} from "./sounds.js";
+import {VOICES, getVoices, speak} from "./speech.js";
 
 const COUNTER = (function () {
     var count, timer, paused, resolve, reject, steps, interval, cb;
@@ -96,55 +78,17 @@ const COUNTER = (function () {
     };
 })();
 
-function ticSound() {
-    if (SETTINGS['soundOutput']) {
-        soundEffect(
-            400,        //frequency
-            0.02,       //attack
-            0.02,       //decay
-            "sine",     //waveform
-            10,         //volume
-            0,          //pan
-            0,          //wait before playing
-            1,          //pitch bend amount
-            false,      //reverse
-            0,          //random pitch range
-            0,          //dissonance
-            undefined,  //echo: [delay, feedback, filter]
-            undefined   //reverb: [duration, decay, reverse?]
-        );
-    }
+function storeProgramsAndSettings() {
+    storeSettings();
+    storePrograms();
 }
 
-function goSound() {
-    if (SETTINGS['soundOutput']) {
-        soundEffect(
-            1046.5,     //frequency
-            0,          //attack
-            0.1,        //decay
-            "sine",     //waveform
-            10,         //Volume
-            0,          //pan
-            0,          //wait before playing
-            0,          //pitch bend amount
-            true,       //reverse bend
-            0,          //random pitch range
-            0,          //dissonance
-            undefined,  //echo array: [delay, feedback, filter]
-            undefined   //reverb array: [duration, decay, reverse?]
-        );
-    }
+async function loadProgramsAndSettings() {
+    await loadSettings();
+    loadPrograms();
 }
 
-function completedSound() {
-    if (SETTINGS['soundOutput']) {
-        soundEffect( 587.33, 0, 0.2, "square", 1, 0, 0);    //D
-        soundEffect( 880   , 0, 0.2, "square", 1, 0, 0.1);  //A
-        soundEffect(1174.66, 0, 0.3, "square", 1, 0, 0.2);  //High D
-    }
-}
-
-export async function savePrograms() {
+export async function exportPrograms() {
     const date = new Date();
     const filename = `programs_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${(date.getDate()).toString().padStart(2, "0")}_${date.getHours().toString().padStart(2, "0")}${date.getMinutes().toString().padStart(2, "0")}.json`;
 
@@ -169,7 +113,7 @@ export async function savePrograms() {
     }
 }
 
-export async function uploadPrograms() {
+export async function importPrograms() {
     const file = (await FilePicker.pickFiles({readData: true})).files[0];
     try {
         const ct = JSON.parse(atob(file.data));
@@ -203,7 +147,9 @@ export async function uploadPrograms() {
     }
 
     function doImport(ct) {
-        CUSTOM_PROGRAMS = ct;
+        for (const prop of Object.getOwnPropertyNames(CUSTOM_PROGRAMS))
+            delete CUSTOM_PROGRAMS[prop];
+        Object.assign(CUSTOM_PROGRAMS, ct);
         console.info(`Imported ${countPrograms(ct)} programs from file '${file.name}'`);
         storeProgramsAndSettings();
         updateMainPage();
@@ -217,78 +163,6 @@ export async function uploadPrograms() {
             }
         }
         return num;
-    }
-}
-
-function storeProgramsAndSettings() {
-    window.localStorage.setItem('settings', JSON.stringify(SETTINGS));
-    window.localStorage.setItem('programs', JSON.stringify(CUSTOM_PROGRAMS));
-}
-
-async function loadProgramsAndSettings() {
-    if (window.localStorage.getItem('settings')) {
-        let loaded_settings = JSON.parse(window.localStorage.getItem('settings'));
-        SETTINGS = DEFAULT_SETTINGS;
-        for (let prop in DEFAULT_SETTINGS) {
-            if ((prop != 'version') &&  (Object.prototype.hasOwnProperty.call(loaded_settings, prop))) {
-                SETTINGS[prop] = loaded_settings[prop];
-            }
-        }
-        if (SETTINGS.version != DEFAULT_SETTINGS.version) {
-            console.warn('Stored settings outdated. Partially restored.');
-        }
-    }
-    else {
-        SETTINGS = DEFAULT_SETTINGS;
-        console.info('Using default settings.');
-    }
-
-    if (SETTINGS.voice === undefined) {
-        console.warn('No voice selected. Selecting first system voice if available.');
-        await getVoices();
-        if (VOICES[0] !== undefined) {
-            SETTINGS.voice = VOICES[0].voiceURI;
-        }
-    }
-
-    if (window.localStorage.getItem('programs')) {
-        CUSTOM_PROGRAMS = JSON.parse(window.localStorage.getItem('programs'));
-        if (CUSTOM_PROGRAMS.version != DEFAULT_PROGRAMS.version) {
-            CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
-            console.warn('Stored custom programs outdated. Discarding. Sorry for that.');
-        }
-    }
-    else {
-        CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
-        console.info('No stored custom programs found.');
-    }
-}
-
-async function speak(message) {
-    if (SETTINGS['speechOutput'] && SETTINGS.voice) {
-        if (VOICES.length < 1) {
-            await getVoices();
-        }
-        let selected_voice;
-        for (let i in VOICES) {
-            if (VOICES[i].voiceURI === SETTINGS.voice) {
-                selected_voice = VOICES[i];
-                break;
-            }
-        }
-        console.info(`Speaking "${message}"`);
-        await TextToSpeech.speak({
-            text: message,
-            lang: 'en-US',
-            rate: 1.0,
-            pitch: 1.0,
-            volume: 1.0,
-            voice: selected_voice,
-            category: 'ambient',
-        });
-    }
-    else {
-        console.warn(`Not speaking: "${message}"`);
     }
 }
 
@@ -445,37 +319,6 @@ function getProgram(identifier) {
         program = DEFAULT_PROGRAMS[SETTINGS.selectedBoardID][num];
     }
     return program;
-}
-
-async function getVoices() {
-    try {
-        console.log("getVoices");
-        VOICES = [];
-        const { voices } = await TextToSpeech.getSupportedVoices();
-        console.log(voices);
-        if (voices !== null) {
-            for (let i = 0; i < voices.length ; i++) {
-                let v = Array.isArray(voices) ? voices[i] : voices.item(i);
-                if ((v.lang.startsWith('en')) && (v.localService === true)) {
-                    // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
-                    VOICES.push(v);
-                }
-            }
-            VOICES.sort(function(a,b) {
-                if (a.lang > b.lang) {
-                    return 1;
-                  }
-                  if (a.lang < b.lang) {
-                    return -1;
-                  }
-                  return 0;
-            });
-        }
-        console.info(`Found ${VOICES.length} matching voices`) ;
-    }
-    catch (err) {
-        console.error("Error while getting voices", err);
-    }
 }
 
 export async function updateSettingsPage() {
@@ -671,11 +514,11 @@ export function updateMainPage(identifier) {
 
     document.getElementById('ExportButton').addEventListener('click', function() {
         document.getElementById("MainMenu").close();
-        savePrograms();
+        exportPrograms();
     }, false);
     document.getElementById("ImportButton").addEventListener("click", function() {
         document.getElementById("MainMenu").close();
-        uploadPrograms();
+        importPrograms();
     }, false);
 }
 

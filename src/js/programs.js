@@ -587,78 +587,22 @@ export const DEFAULT_PROGRAMS = {
     ]
 };
 
-export const OLD = [
-    {
-        "title":        "Ralfi Beginner", // https://ralfisordinarylife.files.wordpress.com/2016/02/hangboard-training-plan-beginner.pdf
-        "description":  "Hangboard training plan for beginners",
-        "exercises":    [
-            {
-                "title":        "Four fingers jug",
-                "description":  "Hang with straight arms",
-                "left":         1,
-                "right":        1,
-                "hold":         6,
-                "rest":         4,
-                "repeat":       4,
-                "pause":        15,
-            },
-            {
-                "title":        "Open three fingers",
-                "description":  "Hang with straight arms",
-                "left":         9,
-                "right":        9,
-                "hold":         6,
-                "rest":         4,
-                "repeat":       4,
-                "pause":        140,
-            },
-            {
-                "title":        "Four fingers half-crimp",
-                "description":  "Hang with straight arms",
-                "left":         6,
-                "right":        6,
-                "hold":         6,
-                "rest":         4,
-                "repeat":       4,
-                "pause":        140,
-            },
-            {
-                "title":        "Four fingers sloper",
-                "description":  "Hang with straight arms",
-                "left":         3,
-                "right":        3,
-                "hold":         6,
-                "rest":         4,
-                "repeat":       4,
-                "pause":        140,
-            }
-        ]
-    },
-    {
-        "title":        "Short test",
-        "description":  "Not a proper training",
-        "exercises":    [
-            {
-                "title":        "Evil holds",
-                "description":  "Pull up once",
-                "left":         2,
-                "right":        4,
-                "hold":         3,
-                "rest":         3,
-                "repeat":       1,
-                "pause":        16,
-            },
-            {
-                "title":        "Heli Kotter hang",
-                "description":  "Hang with one arm",
-                "left":         0,
-                "right":        2,
-                "hold":         3,
-                "rest":         3,
-                "repeat":       1,
-                "pause":        70,
-            }
+export var CUSTOM_PROGRAMS = {};
 
-        ]
+export function storePrograms() {
+    window.localStorage.setItem('programs', JSON.stringify(CUSTOM_PROGRAMS));
+}
+
+export function loadPrograms() {
+    if (window.localStorage.getItem('programs')) {
+        CUSTOM_PROGRAMS = JSON.parse(window.localStorage.getItem('programs'));
+        if (CUSTOM_PROGRAMS.version != DEFAULT_PROGRAMS.version) {
+            CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
+            console.warn('Stored custom programs outdated. Discarding. Sorry for that.');
+        }
     }
-];
+    else {
+        CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
+        console.info('No stored custom programs found.');
+    }
+}
