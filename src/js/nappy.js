@@ -17,15 +17,14 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { StatusBar } from "@capacitor/status-bar";
 import { KeepAwake } from "@capacitor-community/keep-awake";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Dialog } from '@capacitor/dialog';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 import {BOARDS} from "./boards.js";
-import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, loadPrograms, storePrograms} from "./programs.js";
-import {SETTINGS, loadSettings, storeSettings} from "./settings.js";
+import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, storePrograms} from "./programs.js";
+import {SETTINGS, storeSettings} from "./settings.js";
 import {ticSound, goSound, completedSound} from "./sounds.js";
 import {VOICES, getVoices, speak} from "./speech.js";
 
@@ -81,11 +80,6 @@ const COUNTER = (function () {
 function storeProgramsAndSettings() {
     storeSettings();
     storePrograms();
-}
-
-async function loadProgramsAndSettings() {
-    await loadSettings();
-    loadPrograms();
 }
 
 export async function exportPrograms() {
@@ -745,10 +739,6 @@ export async function updateRunPage() {
 export async function initMain() {
     const program_select = document.getElementsByName('program_select')[0];
 
-    StatusBar.hide();
-
-    await loadProgramsAndSettings();
-
     const start_button = document.getElementsByName('start')[0];
     start_button.addEventListener("click", function startProgram() {
         const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
@@ -774,7 +764,6 @@ export async function initMain() {
         storeProgramsAndSettings();
         let new_identifier = "c" + CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].indexOf(clone);
         updateMainPage(new_identifier);
-        window.scrollTo(0,0);
     });
 
     const delete_button = document.getElementsByName('delete')[0];
@@ -785,7 +774,6 @@ export async function initMain() {
         CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].splice(num, 1);
         storeProgramsAndSettings();
         updateMainPage('c0');
-        window.scrollTo(0,0);
         // TODO: else cannot delete last program
         // TODO: delete button disablen
     });
