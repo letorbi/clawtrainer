@@ -22,17 +22,17 @@ import { StatusBar } from "@capacitor/status-bar";
 import { loadPrograms } from './programs.js';
 import { loadSettings } from './settings.js';
 
-import { MainPage } from './MainPage.js';
-import { EditPage } from './EditPage.js';
-import { RunPage } from './RunPage.js';
-import { SelectPage } from './SelectPage.js';
-import { SettingsPage } from './SettingsPage.js';
-import { AboutPage } from './AboutPage.js';
+import { StartPage } from './pages/start.js';
+import { EditPage } from './pages/edit.js';
+import { RunPage } from './pages/run.js';
+import { BoardsPage } from './pages/boards.js';
+import { SettingsPage } from './pages/settings.js';
+import { AboutPage } from './pages/about.js';
 
-customElements.define('page-main', MainPage);
+customElements.define('page-start', StartPage);
 customElements.define('page-edit', EditPage);
 customElements.define('page-run', RunPage);
-customElements.define('page-select', SelectPage);
+customElements.define('page-boards', BoardsPage);
 customElements.define('page-settings', SettingsPage);
 customElements.define('page-about', AboutPage);
 

@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {SETTINGS, storeSettings} from "./settings.js";
-import {VOICES, getVoices, speak} from "./speech.js";
+import {SETTINGS, storeSettings} from "../settings.js";
+import {VOICES, getVoices, speak} from "../speech.js";
 
 
 async function updateSettingsPage() {

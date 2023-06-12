@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {BOARDS} from "./boards.js";
-import {SETTINGS, storeSettings} from "./settings.js";
+import {BOARDS} from "../boards.js";
+import {SETTINGS, storeSettings} from "../settings.js";
 
 function selectBoard(event) {
-    document.querySelectorAll('div.hangboard_option').forEach(function(i) {
+    document.queryBoardsorAll('div.hangboard_option').forEach(function(i) {
         i.classList.remove("checked");
     });
     event.target.parentElement.classList.add("checked");
@@ -29,7 +29,7 @@ function selectBoard(event) {
     storeSettings();
 }
 
-function initSelect() {
+function initBoards() {
     const hs = document.getElementById('hangboard_select');
     hs.onchange = selectBoard;
     for (let bid in BOARDS) {
@@ -61,7 +61,7 @@ function initSelect() {
     }
 }
 
-export class SelectPage extends HTMLElement {
+export class BoardsPage extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <ion-header>
@@ -78,6 +78,6 @@ export class SelectPage extends HTMLElement {
                 </div>
             </ion-content>
         `;
-        initSelect();
+        initBoards();
     }
 }

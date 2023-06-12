@@ -21,15 +21,15 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, getProgram, storePrograms} from "./programs.js";
-import {SETTINGS} from "./settings.js";
-import {BOARDS} from "./boards.js";
+import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, getProgram, storePrograms} from "../programs.js";
+import {SETTINGS} from "../settings.js";
+import {BOARDS} from "../boards.js";
 
 function navigateTo(page) {
     window.location.hash = `/${page}`;
 }
 
-async function initMain() {
+async function initStart() {
     const program_select = document.getElementsByName('program_select')[0];
 
     const start_button = document.getElementsByName('start')[0];
@@ -56,7 +56,7 @@ async function initMain() {
         CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].push(clone);
         storePrograms();
         let new_identifier = "c" + CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].indexOf(clone);
-        updateMainPage(new_identifier);
+        updateStartPage(new_identifier);
     });
 
     const delete_button = document.getElementsByName('delete')[0];
@@ -66,13 +66,13 @@ async function initMain() {
         const num = selected_program_identifier.substr(1);
         CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].splice(num, 1);
         storePrograms();
-        updateMainPage('c0');
+        updateStartPage('c0');
         // TODO: else cannot delete last program
         // TODO: delete button disablen
     });
 }
 
-function updateMainPage(identifier) {
+function updateStartPage(identifier) {
     const program_select = document.getElementsByName('program_select')[0];
 
     let selected_program_identifier = (typeof identifier !== 'undefined')
@@ -205,11 +205,11 @@ function updateMainPage(identifier) {
     }
 
     document.getElementById('ExportButton').addEventListener('click', function() {
-        document.getElementById("MainMenu").close();
+        document.getElementById("StartMenu").close();
         exportPrograms();
     }, false);
     document.getElementById("ImportButton").addEventListener("click", function() {
-        document.getElementById("MainMenu").close();
+        document.getElementById("StartMenu").close();
         importPrograms();
     }, false);
 }
@@ -278,7 +278,7 @@ export async function importPrograms() {
         Object.assign(CUSTOM_PROGRAMS, ct);
         console.info(`Imported ${countPrograms(ct)} programs from file '${file.name}'`);
         storePrograms();
-        updateMainPage();
+        updateStartPage();
     }
 
     function countPrograms(p) {
@@ -292,10 +292,10 @@ export async function importPrograms() {
     }
 }
 
-export class MainPage extends HTMLElement {
+export class StartPage extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-            <ion-menu id="MainMenu" content-id="main-content">
+            <ion-menu id="StartMenu" content-id="main-content">
                 <ion-header>
                     <ion-toolbar>
                         <ion-title>Claw Trainer</ion-title>
@@ -355,7 +355,7 @@ export class MainPage extends HTMLElement {
                 </ion-content>
             </div>
         `;
-        initMain();
-        updateMainPage();
+        initStart();
+        updateStartPage();
     }
 }

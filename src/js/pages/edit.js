@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {getProgram, storePrograms} from "./programs.js";
-import {SETTINGS} from "./settings.js";
-import {BOARDS} from "./boards.js";
+import {getProgram, storePrograms} from "../programs.js";
+import {SETTINGS} from "../settings.js";
+import {BOARDS} from "../boards.js";
 
 function updateEditPage() {
     const identifier = location.hash.split('/')[2];

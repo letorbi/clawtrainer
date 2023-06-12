@@ -20,11 +20,11 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import { Dialog } from '@capacitor/dialog';
 import { KeepAwake } from "@capacitor-community/keep-awake";
 
-import {BOARDS} from "./boards.js";
-import {getProgram} from "./programs.js";
-import {SETTINGS} from "./settings.js";
-import {ticSound, goSound, completedSound} from "./sounds.js";
-import {speak} from "./speech.js";
+import {BOARDS} from "../boards.js";
+import {getProgram} from "../programs.js";
+import {SETTINGS} from "../settings.js";
+import {ticSound, goSound, completedSound} from "../sounds.js";
+import {speak} from "../speech.js";
 
 const COUNTER = (function () {
     var count, timer, paused, resolve, reject, steps, interval, cb;
