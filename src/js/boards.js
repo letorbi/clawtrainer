@@ -1,9 +1,9 @@
 /*
 This file is part of Claw Trainer.
 
-Copyright (c) 2017-2020 Daniel Schroer
-Copyright (c) 2020-2023 Daniel Schroer & contributors
 Copyright (c) 2023 Torben Haase & contributors
+Copyright (c) 2020-2023 Daniel Schroer & contributors
+Copyright (c) 2017-2020 Daniel Schroer
 
 Claw Trainer is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

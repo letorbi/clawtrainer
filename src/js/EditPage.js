@@ -1,4 +1,212 @@
-import {updateEditPage} from "./nappy.js";
+/*
+This file is part of Claw Trainer.
+
+Copyright (c) 2023 Torben Haase & contributors
+Copyright (c) 2020-2023 Daniel Schroer & contributors
+Copyright (c) 2017-2020 Daniel Schroer
+
+Claw Trainer is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+Claw Trainer is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+import {getProgram, storePrograms} from "./programs.js";
+import {SETTINGS} from "./settings.js";
+import {BOARDS} from "./boards.js";
+
+function updateEditPage() {
+    const identifier = location.hash.split('/')[2];
+    const program = getProgram(identifier);
+
+    const edit_content = document.getElementById('edit_content');
+    if (document.getElementById('program_edit')) {
+        edit_content.removeChild(document.getElementById('program_edit'));
+    }
+
+    const placeholder = document.getElementById('edit_placeholder');
+
+    const template_edit = document.getElementById('template_edit');
+    const fragment = template_edit.content.cloneNode(true);
+
+    const title = fragment.getElementById('edit_program_title');
+    title.value = program.title;
+    title.addEventListener('change', function changedProgramTitle() {
+        program.title = this.value;
+        storePrograms();
+    });
+
+    const description = fragment.getElementById('edit_program_description');
+    description.value = program.description;
+    description.addEventListener('change', function changedProgramDescription() {
+        program.description = this.value;
+        storePrograms();
+    });
+
+    const button_add = fragment.querySelector('button[name=add_exercise]');
+    button_add.addEventListener("click", async function addExercise() {
+        program.exercises.splice(0, 0, {
+            "title":        "",
+            "description":  "",
+            "left":         1,
+            "right":        1,
+            "hold":         5,
+            "rest":         5,
+            "repeat":       5,
+            "pause":        60,
+        });
+        storePrograms();
+        updateEditPage(identifier);
+    });
+
+    edit_content.insertBefore(fragment, placeholder);
+
+    const form = document.getElementById('program_edit');
+    const template_edit_exercise = document.getElementById('template_edit_exercise');
+
+    for (let exercise_num in program.exercises) {
+        const exercise = program.exercises[exercise_num];
+
+        const fragment = template_edit_exercise.content.cloneNode(true);
+        fragment.querySelectorAll('label').forEach(function(label) {
+            label.htmlFor += "_" + exercise_num;
+        });
+
+        const number = fragment.querySelector('.edit_exercise_number');
+        number.innerHTML = 1 + Number(exercise_num);
+
+        const pause = fragment.getElementById('edit_exercise_pause');
+        pause.value = exercise.pause;
+        pause.id += "_" + exercise_num;
+        pause.addEventListener('change', function changeExercisePause() {
+            if (this.value < 15) {
+                this.value = 15;
+            }
+            program.exercises[exercise_num].pause = Number(this.value);
+            storePrograms();
+        });
+
+        const title = fragment.getElementById('edit_exercise_title');
+        title.value = exercise.title;
+        title.id += "_" + exercise_num;
+        title.addEventListener('change', function changeExerciseTitle() {
+            program.exercises[exercise_num].title = this.value;
+            storePrograms();
+        });
+
+        const description = fragment.getElementById('edit_exercise_description');
+        description.value = exercise.description;
+        description.id += "_" + exercise_num;
+        description.addEventListener('change', function changeExerciseDescription() {
+            program.exercises[exercise_num].description = this.value;
+            storePrograms();
+        });
+
+        const img_board = fragment.querySelector('img.board_img');
+        const img_left = fragment.querySelector('img.overlay_left');
+        const img_right = fragment.querySelector('img.overlay_right');
+
+        img_board.src = "./images/" + BOARDS[SETTINGS.selectedBoardID].image;
+
+        const left = fragment.getElementById('edit_exercise_left');
+        left.id += "_" + exercise_num;
+        for (let hold_id in BOARDS[SETTINGS.selectedBoardID].left_holds) {
+            const opt = document.createElement('option');
+            opt.setAttribute('value', hold_id);
+            const content = document.createTextNode(BOARDS[SETTINGS.selectedBoardID].left_holds[hold_id].name);
+            opt.appendChild(content);
+            left.appendChild(opt);
+        }
+        left.value = exercise.left;
+        img_left.src = BOARDS[SETTINGS.selectedBoardID].left_holds[exercise.left].image ? "./images/" + BOARDS[SETTINGS.selectedBoardID].left_holds[exercise.left].image : "";
+        left.addEventListener('change', function changeExerciseLeft() {
+            program.exercises[exercise_num].left = parseInt(this.value, 10);
+            img_left.src = "./images/" + BOARDS[SETTINGS.selectedBoardID].left_holds[this.value].image;
+            storePrograms();
+        });
+
+        const right = fragment.getElementById('edit_exercise_right');
+        right.id += "_" + exercise_num;
+        for (let hold_id in BOARDS[SETTINGS.selectedBoardID].right_holds) {
+            const opt = document.createElement('option');
+            opt.setAttribute('value', hold_id);
+            const content = document.createTextNode(BOARDS[SETTINGS.selectedBoardID].right_holds[hold_id].name);
+            opt.appendChild(content);
+            right.appendChild(opt);
+        }
+        right.value = exercise.right;
+        img_right.src = BOARDS[SETTINGS.selectedBoardID].right_holds[exercise.right].image ? "./images/" + BOARDS[SETTINGS.selectedBoardID].right_holds[exercise.right].image : "";
+        right.addEventListener('change', function changeExerciseRight() {
+            program.exercises[exercise_num].right = parseInt(this.value, 10);
+            img_right.src = "./images/" + BOARDS[SETTINGS.selectedBoardID].right_holds[this.value].image;
+            storePrograms();
+        });
+
+        const hold = fragment.getElementById('edit_exercise_hold');
+        hold.value = exercise.hold;
+        hold.id += "_" + exercise_num;
+        hold.addEventListener('change', function changeExerciseHold() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            program.exercises[exercise_num].hold = Number(this.value);
+            storePrograms();
+        });
+
+        const interr = fragment.getElementById('edit_exercise_rest');
+        interr.value = exercise.rest;
+        interr.id += "_" + exercise_num;
+        interr.addEventListener('change', function changeExerciseRest() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            program.exercises[exercise_num].rest = Number(this.value);
+            storePrograms();
+        });
+
+        const repeat = fragment.getElementById('edit_exercise_repeat');
+        repeat.value = exercise.repeat;
+        repeat.id += "_" + exercise_num;
+        repeat.addEventListener('change', function changeExerciseRepeat() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            program.exercises[exercise_num].repeat = Number(this.value);
+            storePrograms();
+        });
+
+        const button_add = fragment.querySelector('button[name=add_exercise]');
+        button_add.addEventListener("click", async function addExercise() {
+            program.exercises.splice(Number(exercise_num) + 1, 0, {
+                "title":        "",
+                "description":  "",
+                "left":         1,
+                "right":        1,
+                "hold":         5,
+                "rest":         5,
+                "repeat":       5,
+                "pause":        60,
+            });
+            storePrograms();
+            updateEditPage(identifier);
+        });
+
+        const button_delete = fragment.querySelector('button[name=delete_exercise]');
+        button_delete.addEventListener("click", async function deleteExercise() {
+            program.exercises.splice(exercise_num, 1);
+            storePrograms();
+            updateEditPage(identifier);
+        });
+
+        form.appendChild(fragment);
+    }
+}
 
 export class EditPage extends HTMLElement {
     connectedCallback() {

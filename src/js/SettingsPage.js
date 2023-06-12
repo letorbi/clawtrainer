@@ -1,4 +1,84 @@
-import {updateSettingsPage} from "./nappy.js";
+/*
+This file is part of Claw Trainer.
+
+Copyright (c) 2023 Torben Haase & contributors
+Copyright (c) 2020-2023 Daniel Schroer & contributors
+Copyright (c) 2017-2020 Daniel Schroer
+
+Claw Trainer is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+Claw Trainer is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+import {SETTINGS, storeSettings} from "./settings.js";
+import {VOICES, getVoices, speak} from "./speech.js";
+
+
+async function updateSettingsPage() {
+    if (VOICES.length < 1) {
+        await getVoices();
+    }
+
+    const voice_select = document.getElementById('select_voice');
+    // Remove voice select options
+    while (voice_select.firstChild) {
+        voice_select.removeChild(voice_select.firstChild);
+    }
+
+    for (let i in VOICES) {
+        const opt = document.createElement('option');
+        opt.setAttribute('value', i);
+        if (SETTINGS.voice === VOICES[i].voiceURI) {
+            opt.defaultSelected = true;
+        }
+        const content = document.createTextNode(`${VOICES[i].name} (${VOICES[i].lang})`);
+        opt.appendChild(content);
+        voice_select.appendChild(opt);
+    }
+    voice_select.onchange = function selectVoice() {
+        let v_num = voice_select.options[voice_select.selectedIndex].value;
+        SETTINGS.voice = VOICES[v_num].voiceURI;
+        storeSettings();
+        let temp = SETTINGS['speechOutput'];
+        SETTINGS['speechOutput'] = true;
+        speak("Claw Trainer: Strong fingers for strong climbing");
+        SETTINGS['speechOutput'] = temp;
+    };
+
+    let checkbox_showDefaultPrograms = document.getElementById('checkbox_showDefaultPrograms');
+    if (SETTINGS.showDefaultPrograms) {
+        checkbox_showDefaultPrograms.setAttribute('checked', 'checked');
+    }
+    checkbox_showDefaultPrograms.onchange = function setShowDefaultPrograms() {
+        SETTINGS.showDefaultPrograms = this.checked;
+        storeSettings();
+    };
+
+    let checkbox_speechOutput = document.getElementById('checkbox_speechOutput');
+    if (SETTINGS.speechOutput) {
+        checkbox_speechOutput.setAttribute('checked', 'checked');
+    }
+    checkbox_speechOutput.onchange = function setSpeechOutput() {
+        SETTINGS.speechOutput = this.checked;
+        storeSettings();
+    };
+
+    let checkbox_soundOutput = document.getElementById('checkbox_soundOutput');
+    if (SETTINGS.soundOutput) {
+        checkbox_soundOutput.setAttribute('checked', 'checked');
+    }
+    checkbox_soundOutput.onchange = function setSoundOutput() {
+        SETTINGS.soundOutput = this.checked;
+        storeSettings();
+    };
+}
 
 export class SettingsPage extends HTMLElement {
     connectedCallback() {

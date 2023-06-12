@@ -1,9 +1,9 @@
 /*
 This file is part of Claw Trainer.
 
-Copyright (c) 2017-2020 Daniel Schroer
-Copyright (c) 2020-2023 Daniel Schroer & contributors
 Copyright (c) 2023 Torben Haase & contributors
+Copyright (c) 2020-2023 Daniel Schroer & contributors
+Copyright (c) 2017-2020 Daniel Schroer
 
 Claw Trainer is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
+
+import {SETTINGS} from "./settings.js";
 
 export const DEFAULT_PROGRAMS = {
     "version": 3,
@@ -605,4 +607,19 @@ export function loadPrograms() {
         CUSTOM_PROGRAMS = { "version": DEFAULT_PROGRAMS.version };
         console.info('No stored custom programs found.');
     }
+}
+
+
+export function getProgram(identifier) {
+    // identifier: e.g. c1
+    const type = identifier.substr(0, 1);
+    const num = identifier.substr(1);
+    let program;
+    if (type == 'c') {
+        program = CUSTOM_PROGRAMS[SETTINGS.selectedBoardID][num];
+    }
+    else if (type == 'd') {
+        program = DEFAULT_PROGRAMS[SETTINGS.selectedBoardID][num];
+    }
+    return program;
 }
