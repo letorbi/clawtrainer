@@ -21,7 +21,7 @@ import {BOARDS} from "../boards.js";
 import {SETTINGS, storeSettings} from "../settings.js";
 
 function selectBoard(event) {
-    document.queryBoardsorAll('div.hangboard_option').forEach(function(i) {
+    document.querySelectorAll('div.hangboard_option').forEach(function(i) {
         i.classList.remove("checked");
     });
     event.target.parentElement.classList.add("checked");

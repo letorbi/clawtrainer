@@ -303,7 +303,7 @@ export class StartPage extends HTMLElement {
                 </ion-header>
                 <ion-content>
                     <ion-list>
-                        <ion-item href="#/select">
+                        <ion-item href="#/boards">
                             <ion-icon name="barbell-outline" slot="start"></ion-icon> 
                             <ion-label>Switch Hangboard</ion-label>
                         </ion-item>
