@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {SETTINGS, storeSettings} from "../settings.js";
+import {SETTINGS} from "../settings.js";
 import {VOICES, getVoices, speak} from "../speech.js";
 
 
@@ -45,7 +45,6 @@ async function updateSettingsPage() {
     voice_select.onchange = function selectVoice() {
         let v_num = voice_select.options[voice_select.selectedIndex].value;
         SETTINGS.voice = VOICES[v_num].voiceURI;
-        storeSettings();
         let temp = SETTINGS['speechOutput'];
         SETTINGS['speechOutput'] = true;
         speak("Claw Trainer: Strong fingers for strong climbing");
@@ -58,7 +57,6 @@ async function updateSettingsPage() {
     }
     checkbox_showDefaultPrograms.onchange = function setShowDefaultPrograms() {
         SETTINGS.showDefaultPrograms = this.checked;
-        storeSettings();
     };
 
     let checkbox_speechOutput = document.getElementById('checkbox_speechOutput');
@@ -67,7 +65,6 @@ async function updateSettingsPage() {
     }
     checkbox_speechOutput.onchange = function setSpeechOutput() {
         SETTINGS.speechOutput = this.checked;
-        storeSettings();
     };
 
     let checkbox_soundOutput = document.getElementById('checkbox_soundOutput');
@@ -76,7 +73,6 @@ async function updateSettingsPage() {
     }
     checkbox_soundOutput.onchange = function setSoundOutput() {
         SETTINGS.soundOutput = this.checked;
-        storeSettings();
     };
 }
 

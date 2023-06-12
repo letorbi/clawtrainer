@@ -18,7 +18,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
 import {BOARDS} from "../boards.js";
-import {SETTINGS, storeSettings} from "../settings.js";
+import {SETTINGS} from "../settings.js";
 
 function selectBoard(event) {
     document.querySelectorAll('div.hangboard_option').forEach(function(i) {
@@ -26,7 +26,6 @@ function selectBoard(event) {
     });
     event.target.parentElement.classList.add("checked");
     SETTINGS.selectedBoardID = event.target.value;
-    storeSettings();
 }
 
 function initBoards() {
