@@ -272,4 +272,8 @@ export class RunPage extends HTMLElement {
         initRun();
         updateRunPage();
     }
+
+    disconnectedCallback() {
+        COUNTER.stop();
+    }
 }
