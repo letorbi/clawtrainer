@@ -20,6 +20,8 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import { Dialog } from '@capacitor/dialog';
 import { KeepAwake } from "@capacitor-community/keep-awake";
 
+import {ComponentElement} from "../lib/component.js";
+
 import {BOARDS} from "../boards.js";
 import {getProgram} from "../programs.js";
 import {SETTINGS} from "../settings.js";
@@ -75,205 +77,203 @@ const COUNTER = (function () {
     };
 })();
 
-async function runProgram(board, program) {
-    const exercise_title_div = document.getElementById("exercise_title");
-    const exercise_description_div = document.getElementById("exercise_description");
-    const time_counter = document.getElementById("time_counter");
-    const hold_pbar = document.getElementById("hold_pbar");
-    const rest_pbar = document.getElementById("rest_pbar");
-    const pause_pbar = document.getElementById("pause_pbar");
 
-    document.querySelector('#run_content .board_img').src = "./images/" + board.image;
+export class RunPage extends ComponentElement {
+    async connectedCallback() {
+        super.connectedCallback(html);
 
-    for (let i in program.exercises) {
-        let exercise = program.exercises[i];
-        if (exercise.pause < 15) {
-            exercise.pause = 15;
+        const pause_button = document.getElementsByName("pause")[0];
+        pause_button.addEventListener("click", COUNTER.pause);
+
+
+        const identifier = location.hash.split('/')[2];
+        const program = getProgram(identifier);
+        try {
+            KeepAwake.keepAwake();
+            await this.runProgram(BOARDS[SETTINGS.selectedBoardID], program);
+            history.back();
         }
-
-        if (i > 0) { // Vor dem ersten Satz keine Ansage der Pause
-            speak(makePauseString(exercise.pause, false));
-            exercise_title_div.textContent = "Pause";
-            exercise_description_div.textContent = `Pause for ${Math.floor(exercise.pause / 60)}:${(exercise.pause % 60).toString().padStart(2, "0")} min.`;
+        catch (err) {
+            console.warn("Program aborted", err);
         }
-        else {
-            exercise_title_div.textContent = "Get ready";
-            exercise_description_div.textContent = "";
+        finally {
+            KeepAwake.allowSleep();
         }
-
-        document.querySelectorAll("#run_content .overlay_img").forEach(function(element) {
-            element.src = "";
-        });
-
-        pause_pbar.max = exercise.pause;
-        pause_pbar.style.display = "inline-block";
-        hold_pbar.style.display = "none";
-        rest_pbar.style.display = "none";
-        document.getElementById("exercise_counter").textContent = Number(i) + 1 + "/" + program.exercises.length;
-        document.getElementById("repeat_counter").textContent = "   ";
-
-        await COUNTER.start(
-            exercise.pause,
-            1000,
-            function pauseCountdownStep(step) {
-                time_counter.textContent = exercise.pause - step;
-                pause_pbar.value = step + 1;
-
-                if (exercise.pause - step == 15) { // 15s vor Ende der Pause: Ankündigung des nächsten Satzes
-                    speak(`Next exercise: ${exercise.description} for ${exercise.hold} seconds. Left hand ${board.left_holds[exercise.left].name}. Right hand ${board.right_holds[exercise.right].name}. Repeat ${exercise.repeat} ${((exercise.repeat > 1) ? "times" : "time")}.`);
-
-                    exercise_title_div.textContent = exercise.title;
-                    exercise_description_div.textContent = exercise.description;
-
-                    document.querySelector("#run_content .overlay_left").src = board.left_holds[exercise.left].image ? "./images/" + board.left_holds[exercise.left].image : "";
-                    document.querySelector("#run_content .overlay_right").src = board.right_holds[exercise.right].image ? "./images/" + board.right_holds[exercise.right].image : "";
-                }
-                if (step > 0 && ((exercise.pause - step) % 30 == 0)) { // alle 30s Zeit ansagen
-                    speak(makePauseString(exercise.pause - step, true));
-                }
-                if (exercise.pause - step <= 5) { // letzte fünf Sekunden der Pause ticken
-                    ticSound();
-                }
-            }
-        );
-
-        await runExercise(exercise);
-    }
-    speak("Congratulations!");
-    await Dialog.alert({
-        title: 'Congratulations',
-        message: `You have completed program ${program.title}!`
-    });
-
-    async function runExercise(exercise) {
-        pause_pbar.style.display = "none";
-        hold_pbar.style.display = "inline-block";
-        rest_pbar.style.display = "inline-block";
-
-        hold_pbar.max = exercise.hold;
-        hold_pbar.style.width = 100 * exercise.hold / (exercise.hold + exercise.rest) + "%";
-
-        rest_pbar.max = exercise.rest;
-        rest_pbar.style.width = 100 * exercise.rest / (exercise.hold + exercise.rest) + "%";
-
-        for (let rep = 0; rep < exercise.repeat; rep++) {
-            hold_pbar.value = 0;
-            rest_pbar.value = 0;
-            if (rep == exercise.repeat - 1) { // bei letzter Wiederholung rest-Balken weg
-                rest_pbar.style.display = "none";
-            }
-
-            document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
-
-            if (!SETTINGS.speechOutput) {
-                goSound();
-            }
-            speak("Go!");
-            await COUNTER.start(
-                exercise.hold,
-                1000,
-                function holdCountdownStep(step) {
-                    time_counter.textContent = exercise.hold - step;
-                    hold_pbar.value = step + 1;
-                }
-            );
-            completedSound();
-
-            if (rep < exercise.repeat - 1) { // bei letzter Wiederholung keine rest-Pause
-                await COUNTER.start(
-                    exercise.rest,
-                    1000,
-                    function restCountdownStep(step) {
-                        time_counter.textContent = exercise.rest - step;
-                        rest_pbar.value = step + 1;
-
-                        if (exercise.rest - step <= 3) {
-                            ticSound();
-                        }
-                    }
-                );
-            }
-        }
-    }
-
-    function makePauseString(pause, short = false) {
-        const minutes = Math.floor(pause / 60);
-        const seconds = pause % 60;
-        let pause_str = short ? "" : "Pause for ";
-        if (minutes != 0) {
-            pause_str += minutes + ((minutes > 1) ? " minutes" : " minute");
-            if (seconds != 0) {
-                pause_str += short ? " " : " and ";
-            }
-        }
-        if (seconds != 0) {
-            pause_str += seconds;
-            if (!short || minutes == 0) {
-                pause_str += (seconds > 1) ? " seconds" : " second";
-            }
-        }
-        return pause_str + ".";
-    }
-}
-
-async function updateRunPage() {
-    const identifier = location.hash.split('/')[2];
-    const program = getProgram(identifier);
-    try {
-        KeepAwake.keepAwake();
-        await runProgram(BOARDS[SETTINGS.selectedBoardID], program);
-        history.back();
-    }
-    catch (err) {
-        console.warn("Program aborted", err);
-    }
-    finally {
-        KeepAwake.allowSleep();
-    }
-}
-
-async function initRun() {
-    const pause_button = document.getElementsByName("pause")[0];
-    pause_button.addEventListener("click", COUNTER.pause);
-}
-
-export class RunPage extends HTMLElement {
-    connectedCallback() {
-        this.innerHTML = `
-            <ion-header>
-                <ion-toolbar color="primary">
-                    <ion-buttons slot="start">
-                        <ion-back-button default-href="/"></ion-back-button>
-                    </ion-buttons>
-                    <ion-title>Edit</ion-title>
-                </ion-toolbar>
-            </ion-header>
-            <ion-content class="ion-padding">
-                <div id="run_content">
-                    <div class="board_outer_container">
-                        <div class="board_inner_container">
-                            <img class="board_img" src="" alt=""/>
-                            <img class="overlay_img overlay_left" src="" alt=""/>
-                            <img class="overlay_img overlay_right" src="" alt=""/>
-                        </div>
-                    </div>
-                    <h2 id="exercise_title"></h2>
-                    <p id="exercise_description"></p>
-                    <div id="counter"><span id="exercise_counter"></span><span id="time_counter"></span><span id="repeat_counter"></span></div>
-                    <div id="pbars">
-                        <progress id="hold_pbar" max="7" value="0"></progress><progress id="rest_pbar" max="3" value="0"></progress>
-                        <progress id="pause_pbar" max="7" value="0"></progress>
-                    </div>
-                    <!--<div id="pause_overlay"><i class="material-icons md-dark md-288">pause_circle_outline</i></div>-->
-                    <button class="button_wide" name="pause"><i class="material-icons md-dark">pause</i>Suspend</button>
-                </div>
-            </ion-content>
-        `;
-        initRun();
-        updateRunPage();
     }
 
     disconnectedCallback() {
         COUNTER.stop();
     }
+
+    async runProgram(board, program) {
+        const exercise_title_div = document.getElementById("exercise_title");
+        const exercise_description_div = document.getElementById("exercise_description");
+        const time_counter = document.getElementById("time_counter");
+        const hold_pbar = document.getElementById("hold_pbar");
+        const rest_pbar = document.getElementById("rest_pbar");
+        const pause_pbar = document.getElementById("pause_pbar");
+
+        this.querySelector('#run_content .board_img').src = "./images/" + board.image;
+
+        for (let i in program.exercises) {
+            let exercise = program.exercises[i];
+            if (exercise.pause < 15) {
+                exercise.pause = 15;
+            }
+
+            if (i > 0) { // Vor dem ersten Satz keine Ansage der Pause
+                speak(makePauseString(exercise.pause, false));
+                exercise_title_div.textContent = "Pause";
+                exercise_description_div.textContent = `Pause for ${Math.floor(exercise.pause / 60)}:${(exercise.pause % 60).toString().padStart(2, "0")} min.`;
+            }
+            else {
+                exercise_title_div.textContent = "Get ready";
+                exercise_description_div.textContent = "";
+            }
+
+            this.querySelectorAll("#run_content .overlay_img").forEach(function(element) {
+                element.src = "";
+            });
+
+            pause_pbar.max = exercise.pause;
+            pause_pbar.style.display = "inline-block";
+            hold_pbar.style.display = "none";
+            rest_pbar.style.display = "none";
+            document.getElementById("exercise_counter").textContent = Number(i) + 1 + "/" + program.exercises.length;
+            document.getElementById("repeat_counter").textContent = "   ";
+
+            await COUNTER.start(
+                exercise.pause,
+                1000,
+                function pauseCountdownStep(step) {
+                    time_counter.textContent = exercise.pause - step;
+                    pause_pbar.value = step + 1;
+
+                    if (exercise.pause - step == 15) { // 15s vor Ende der Pause: Ankündigung des nächsten Satzes
+                        speak(`Next exercise: ${exercise.description} for ${exercise.hold} seconds. Left hand ${board.left_holds[exercise.left].name}. Right hand ${board.right_holds[exercise.right].name}. Repeat ${exercise.repeat} ${((exercise.repeat > 1) ? "times" : "time")}.`);
+
+                        exercise_title_div.textContent = exercise.title;
+                        exercise_description_div.textContent = exercise.description;
+
+                        this.querySelector("#run_content .overlay_left").src = board.left_holds[exercise.left].image ? "./images/" + board.left_holds[exercise.left].image : "";
+                        this.querySelector("#run_content .overlay_right").src = board.right_holds[exercise.right].image ? "./images/" + board.right_holds[exercise.right].image : "";
+                    }
+                    if (step > 0 && ((exercise.pause - step) % 30 == 0)) { // alle 30s Zeit ansagen
+                        speak(makePauseString(exercise.pause - step, true));
+                    }
+                    if (exercise.pause - step <= 5) { // letzte fünf Sekunden der Pause ticken
+                        ticSound();
+                    }
+                }
+            );
+
+            await runExercise(exercise);
+        }
+        speak("Congratulations!");
+        await Dialog.alert({
+            title: 'Congratulations',
+            message: `You have completed program ${program.title}!`
+        });
+
+        async function runExercise(exercise) {
+            pause_pbar.style.display = "none";
+            hold_pbar.style.display = "inline-block";
+            rest_pbar.style.display = "inline-block";
+
+            hold_pbar.max = exercise.hold;
+            hold_pbar.style.width = 100 * exercise.hold / (exercise.hold + exercise.rest) + "%";
+
+            rest_pbar.max = exercise.rest;
+            rest_pbar.style.width = 100 * exercise.rest / (exercise.hold + exercise.rest) + "%";
+
+            for (let rep = 0; rep < exercise.repeat; rep++) {
+                hold_pbar.value = 0;
+                rest_pbar.value = 0;
+                if (rep == exercise.repeat - 1) { // bei letzter Wiederholung rest-Balken weg
+                    rest_pbar.style.display = "none";
+                }
+
+                document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
+
+                if (!SETTINGS.speechOutput) {
+                    goSound();
+                }
+                speak("Go!");
+                await COUNTER.start(
+                    exercise.hold,
+                    1000,
+                    function holdCountdownStep(step) {
+                        time_counter.textContent = exercise.hold - step;
+                        hold_pbar.value = step + 1;
+                    }
+                );
+                completedSound();
+
+                if (rep < exercise.repeat - 1) { // bei letzter Wiederholung keine rest-Pause
+                    await COUNTER.start(
+                        exercise.rest,
+                        1000,
+                        function restCountdownStep(step) {
+                            time_counter.textContent = exercise.rest - step;
+                            rest_pbar.value = step + 1;
+
+                            if (exercise.rest - step <= 3) {
+                                ticSound();
+                            }
+                        }
+                    );
+                }
+            }
+        }
+
+        function makePauseString(pause, short = false) {
+            const minutes = Math.floor(pause / 60);
+            const seconds = pause % 60;
+            let pause_str = short ? "" : "Pause for ";
+            if (minutes != 0) {
+                pause_str += minutes + ((minutes > 1) ? " minutes" : " minute");
+                if (seconds != 0) {
+                    pause_str += short ? " " : " and ";
+                }
+            }
+            if (seconds != 0) {
+                pause_str += seconds;
+                if (!short || minutes == 0) {
+                    pause_str += (seconds > 1) ? " seconds" : " second";
+                }
+            }
+            return pause_str + ".";
+        }
+    }
 }
+
+const html = `
+    <ion-header>
+        <ion-toolbar color="primary">
+            <ion-buttons slot="start">
+                <ion-back-button default-href="/"></ion-back-button>
+            </ion-buttons>
+            <ion-title>Edit</ion-title>
+        </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+        <div id="run_content">
+            <div class="board_outer_container">
+                <div class="board_inner_container">
+                    <img class="board_img" src="" alt=""/>
+                    <img class="overlay_img overlay_left" src="" alt=""/>
+                    <img class="overlay_img overlay_right" src="" alt=""/>
+                </div>
+            </div>
+            <h2 id="exercise_title"></h2>
+            <p id="exercise_description"></p>
+            <div id="counter"><span id="exercise_counter"></span><span id="time_counter"></span><span id="repeat_counter"></span></div>
+            <div id="pbars">
+                <progress id="hold_pbar" max="7" value="0"></progress><progress id="rest_pbar" max="3" value="0"></progress>
+                <progress id="pause_pbar" max="7" value="0"></progress>
+            </div>
+            <!--<div id="pause_overlay"><i class="material-icons md-dark md-288">pause_circle_outline</i></div>-->
+            <button class="button_wide" name="pause"><i class="material-icons md-dark">pause</i>Suspend</button>
+        </div>
+    </ion-content>
+`;
