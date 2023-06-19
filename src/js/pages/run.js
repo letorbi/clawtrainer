@@ -145,7 +145,7 @@ export class RunPage extends ComponentElement {
             await COUNTER.start(
                 exercise.pause,
                 1000,
-                function pauseCountdownStep(step) {
+                (step) => {
                     time_counter.textContent = exercise.pause - step;
                     pause_pbar.value = step + 1;
 
