@@ -19,22 +19,10 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
-import {SETTINGS} from './settings.js';
+import {settings} from './settings.js';
 
-export var VOICES = [];
-
-export async function speak(message) {
-    if (SETTINGS['speechOutput'] && SETTINGS.voice) {
-        if (VOICES.length < 1) {
-            await getVoices();
-        }
-        let selected_voice;
-        for (let i in VOICES) {
-            if (VOICES[i].voiceURI === SETTINGS.voice) {
-                selected_voice = VOICES[i];
-                break;
-            }
-        }
+export async function speak(message, force = false) {
+    if ((settings.data.speechOutput || force) && settings.data.voice) {
         console.info(`Speaking "${message}"`);
         await TextToSpeech.speak({
             text: message,
@@ -42,7 +30,7 @@ export async function speak(message) {
             rate: 1.0,
             pitch: 1.0,
             volume: 1.0,
-            voice: selected_voice,
+            voice: getSelectedVoice(),
             category: 'ambient',
         });
     }
@@ -51,21 +39,13 @@ export async function speak(message) {
     }
 }
 
+let _voices = null;
 export async function getVoices() {
-    try {
-        console.log("getVoices");
-        VOICES = [];
-        const { voices } = await TextToSpeech.getSupportedVoices();
-        console.log(voices);
-        if (voices !== null) {
-            for (let i = 0; i < voices.length ; i++) {
-                let v = Array.isArray(voices) ? voices[i] : voices.item(i);
-                if ((v.lang.startsWith('en')) && (v.localService === true)) {
-                    // console.log(`name : ${v.name} lang: ${v.lang} localService: ${v.localService} voiceURI: ${v.voiceURI} default: ${v.default}`);
-                    VOICES.push(v);
-                }
-            }
-            VOICES.sort(function(a,b) {
+    if (_voices === null) {
+        try {
+            let {voices} = await TextToSpeech.getSupportedVoices();
+            voices = voices.filter(v => v.lang.startsWith('en'));
+            voices.sort(function(a,b) {
                 if (a.lang > b.lang) {
                     return 1;
                   }
@@ -74,10 +54,27 @@ export async function getVoices() {
                   }
                   return 0;
             });
+            console.log(`voices found: ${voices}`);
+            _voices = voices;
         }
-        console.info(`Found ${VOICES.length} matching voices`) ;
+        catch (e) {
+            console.error("unable to get voices", e);
+            _voices = [];
+        }
     }
-    catch (err) {
-        console.error("Error while getting voices", err);
+    return _voices;
+}
+
+export async function getSelectedVoice() {
+    const voices = await getVoices();
+    const [selected_voice] = voices.filter(v => v.voiceURI === settings.data.voice);
+
+    if (selected_voice === undefined) {
+        console.warn('Invalid voice. Selecting first system voice if available.');
+        if (voices[0] !== undefined) {
+            settings.data.voice = voices[0].voiceURI;
+        }
     }
+
+    return selected_voice;
 }

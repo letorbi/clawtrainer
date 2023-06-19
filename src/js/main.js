@@ -22,7 +22,6 @@ import { App } from '@capacitor/app';
 
 import { loadPrograms } from './programs.js';
 import { settings } from './settings.js';
-import {VOICES, getVoices} from "./speech.js";
 
 import { StartPage } from './pages/start.js';
 import { EditPage } from './pages/edit.js';
@@ -48,14 +47,6 @@ async function init() {
 
     settings.load();
     loadPrograms();
-
-    if (settings.data.voice === undefined) {
-        console.warn('No voice selected. Selecting first system voice if available.');
-        await getVoices();
-        if (VOICES[0] !== undefined) {
-            settings.data.voice = VOICES[0].voiceURI;
-        }
-    }
 
     App.addListener('resume', () => {
         settings.load();

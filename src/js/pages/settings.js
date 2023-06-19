@@ -20,38 +20,32 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import {ComponentElement} from "../lib/component.js";
 
 import {settings, SETTINGS} from "../settings.js";
-import {VOICES, getVoices, speak} from "../speech.js";
+import {getVoices, speak} from "../speech.js";
 
 export class SettingsPage extends ComponentElement {
     async connectedCallback() {
         super.connectedCallback(html);
 
-        if (VOICES.length < 1) {
-            await getVoices();
-        }
+        const voices = await getVoices();
 
         const voice_select = document.getElementById("select_voice");
-        for (let i in VOICES) {
+        for (let i in voices) {
             const opt = document.createElement('option');
             opt.setAttribute('value', i);
-            if (SETTINGS.voice === VOICES[i].voiceURI) {
+            if (SETTINGS.voice === voices[i].voiceURI) {
                 opt.defaultSelected = true;
             }
-            const content = document.createTextNode(`${VOICES[i].name} (${VOICES[i].lang})`);
+            const content = document.createTextNode(`${voices[i].name} (${voices[i].lang})`);
             opt.appendChild(content);
             voice_select.appendChild(opt);
         }
-
         settings.addObserver(this, 'voice', function () {
-            //let temp = SETTINGS['speechOutput'];
-            //SETTINGS['speechOutput'] = true;
-            speak("Claw Trainer: Strong fingers for strong climbing");
-            //SETTINGS['speechOutput'] = temp;
+            speak("Claw Trainer: Strong fingers for strong climbing", true);
         }, false);
         voice_select.addEventListener("change", () => {
             // There is no easy way to prevent the default behaviour, so we just live with it.
             let v_num = voice_select.options[voice_select.selectedIndex].value;
-            settings.data.voice = VOICES[v_num].voiceURI;
+            settings.data.voice = voices[v_num].voiceURI;
         }, false);
 
         const checkbox_showDefaultPrograms = document.getElementById("checkbox_showDefaultPrograms");
