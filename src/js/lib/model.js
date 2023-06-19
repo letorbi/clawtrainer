@@ -25,38 +25,49 @@ export class Model {
             set: (target, key, value) => {
                 target[key] = value;
                 if (this.observers[key])
-                    this.observers[key].dispatchEvent(new Event('change'));
+                    // The use of setTimeout ensures that the event is dispatched asynchronously
+                    setTimeout(() => this.observers[key].dispatchEvent(new Event('change')), 0);
                 return true;
             }
         });
     }
 
-    addObserver(key, observer) {
+    addObserver(owner, key, observer, runImmediately = false) {
         if (!Object.prototype.hasOwnProperty.call(this.data, key))
             throw new Error(`key "${key}' does not exist`);
+        if (owner.isConnected === false)
+            throw new Error("owner is not connected");
         if (!this.observers[key])
             this.observers[key] = document.createTextNode(null);
-        this.observers[key].addEventListener("change", observer, false);
-    }
 
-    removeObserver(key, observer) {
-        if (!Object.prototype.hasOwnProperty.call(this.data, key))
-            throw new Error(`key "${key}' does not exist`);
-        this.observers[key].removeEventListener("change", observer, false);
+        const eventListener = () => observer(this.data[key]);
+        this.observers[key].addEventListener("change", eventListener, false);
+
+        (new MutationObserver((mutationsList, mutationObserver) => {
+            for (const mutation of mutationsList) {
+                for (const node of mutation.removedNodes) {
+                    if (node === owner) {
+                        this.observers[key].removeEventListener("change", eventListener, false);
+                        mutationObserver.disconnect();
+                    }
+                }
+            }
+        })).observe(owner.parentNode, { childList: true });
+
+        if (runImmediately)
+            eventListener();
     }
 
     save() {
         if (!this.name)
             throw new Error("model has no name");
-        console.log(`storing model "${this.name}"`);
         window.localStorage.setItem(this.name, JSON.stringify(this.data));
     }
 
     load() {
         if (!this.name)
             throw new Error("model has no name");
-        console.log(`loading model "${this.name}"`);
-        let data = JSON.parse(window.localStorage.getItem(this.name));
+        const data = JSON.parse(window.localStorage.getItem(this.name));
         Object.assign(this.data, data);
     }
 }

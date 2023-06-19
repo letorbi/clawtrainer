@@ -19,7 +19,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import {ComponentElement} from "../lib/component.js";
 
-import {SETTINGS} from "../settings.js";
+import {settings, SETTINGS} from "../settings.js";
 import {VOICES, getVoices, speak} from "../speech.js";
 
 export class SettingsPage extends ComponentElement {
@@ -31,11 +31,6 @@ export class SettingsPage extends ComponentElement {
         }
 
         const voice_select = document.getElementById("select_voice");
-        // Remove voice select options
-        while (voice_select.firstChild) {
-            voice_select.removeChild(voice_select.firstChild);
-        }
-
         for (let i in VOICES) {
             const opt = document.createElement('option');
             opt.setAttribute('value', i);
@@ -46,38 +41,45 @@ export class SettingsPage extends ComponentElement {
             opt.appendChild(content);
             voice_select.appendChild(opt);
         }
-        voice_select.onchange = function selectVoice() {
-            let v_num = voice_select.options[voice_select.selectedIndex].value;
-            SETTINGS.voice = VOICES[v_num].voiceURI;
-            let temp = SETTINGS['speechOutput'];
-            SETTINGS['speechOutput'] = true;
+
+        settings.addObserver(this, 'voice', function () {
+            //let temp = SETTINGS['speechOutput'];
+            //SETTINGS['speechOutput'] = true;
             speak("Claw Trainer: Strong fingers for strong climbing");
-            SETTINGS['speechOutput'] = temp;
-        };
+            //SETTINGS['speechOutput'] = temp;
+        }, false);
+        voice_select.addEventListener("change", () => {
+            // There is no easy way to prevent the default behaviour, so we just live with it.
+            let v_num = voice_select.options[voice_select.selectedIndex].value;
+            settings.data.voice = VOICES[v_num].voiceURI;
+        }, false);
 
-        let checkbox_showDefaultPrograms = document.getElementById("checkbox_showDefaultPrograms");
-        if (SETTINGS.showDefaultPrograms) {
-            checkbox_showDefaultPrograms.setAttribute('checked', 'checked');
-        }
-        checkbox_showDefaultPrograms.onchange = function setShowDefaultPrograms() {
-            SETTINGS.showDefaultPrograms = this.checked;
-        };
+        const checkbox_showDefaultPrograms = document.getElementById("checkbox_showDefaultPrograms");
+        settings.addObserver(this, 'showDefaultPrograms', function () {
+            checkbox_showDefaultPrograms.checked = settings.data.showDefaultPrograms;
+        }, true);
+        checkbox_showDefaultPrograms.addEventListener("click", (evt) => {
+            evt.preventDefault();
+            settings.data.showDefaultPrograms = !settings.data.showDefaultPrograms;
+        }, false);
 
-        let checkbox_speechOutput = document.getElementById("checkbox_speechOutput");
-        if (SETTINGS.speechOutput) {
-            checkbox_speechOutput.setAttribute('checked', 'checked');
-        }
-        checkbox_speechOutput.onchange = function setSpeechOutput() {
-            SETTINGS.speechOutput = this.checked;
-        };
+        const checkbox_speechOutput = document.getElementById("checkbox_speechOutput");
+        settings.addObserver(this, 'speechOutput', function () {
+            checkbox_speechOutput.checked = settings.data.speechOutput;
+        }, true);
+        checkbox_speechOutput.addEventListener("click", (evt) => {
+            evt.preventDefault();
+            settings.data.speechOutput = !settings.data.speechOutput;
+        }, false);
 
-        let checkbox_soundOutput = document.getElementById("checkbox_soundOutput");
-        if (SETTINGS.soundOutput) {
-            checkbox_soundOutput.setAttribute('checked', 'checked');
-        }
-        checkbox_soundOutput.onchange = function setSoundOutput() {
-            SETTINGS.soundOutput = this.checked;
-        };
+        const checkbox_soundOutput = document.getElementById("checkbox_soundOutput");
+        settings.addObserver(this, 'soundOutput', function () {
+            checkbox_soundOutput.checked = settings.data.soundOutput;
+        }, true);
+        checkbox_soundOutput.addEventListener("click", (evt) => {
+            evt.preventDefault();
+            settings.data.soundOutput = !settings.data.soundOutput;
+        }, false);
     }
 }
 
