@@ -20,35 +20,18 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import { ComponentElement } from '../lib/component.js';
 
 import {BOARDS} from "../boards.js";
-import {SETTINGS} from "../settings.js";
-
-function selectBoard(event) {
-    this.querySelectorAll('div.hangboard_option').forEach(function(i) {
-        i.classList.remove("checked");
-    });
-    event.target.parentElement.classList.add("checked");
-    SETTINGS.selectedBoardID = event.target.value;
-}
+import {settings} from "../settings.js";
 
 export class BoardsPage extends ComponentElement {
     connectedCallback() {
         super.connectedCallback(html);
 
         const hs = document.getElementById("hangboard_select");
-        hs.onchange = selectBoard;
         for (let bid in BOARDS) {
             const div = document.createElement('div');
             div.setAttribute('class', 'hangboard_option');
-            const radio = document.createElement('input');
-            radio.setAttribute('type', 'radio');
-            radio.setAttribute('name', 'hangboard');
-            radio.setAttribute('value', bid);
-            radio.setAttribute('id', 'radio_' + bid);
-            if (bid == SETTINGS.selectedBoardID) {
-                div.classList.add("checked");
-                radio.setAttribute('checked', 'checked');
-            }
-            div.appendChild(radio);
+            div.setAttribute('id', 'hangboard_' + bid);
+            div.addEventListener("click", () => settings.data.selectedBoardID = bid);
             const label = document.createElement('label');
             label.setAttribute('for', 'radio_' + bid);
             const span = document.createElement('span');
@@ -63,6 +46,12 @@ export class BoardsPage extends ComponentElement {
             div.appendChild(label);
             hs.appendChild(div);
         }
+
+        settings.addObserver(this, "selectedBoardID", (bid) => {
+            this.querySelectorAll('div.hangboard_option')
+                .forEach((elmt) => elmt.classList.remove("checked"));
+            document.getElementById(`hangboard_${bid}`).classList.add("checked");
+        }, true);
     }
 }
 
