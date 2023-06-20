@@ -23,7 +23,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import {ComponentElement} from "../lib/component.js";
 
 import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, getProgram, storePrograms} from "../programs.js";
-import {SETTINGS} from "../settings.js";
+import {settings} from "../settings.js";
 import {BOARDS} from "../boards.js";
 
 function navigateTo(page) {
@@ -34,6 +34,7 @@ export class StartPage extends ComponentElement {
     connectedCallback() {
         super.connectedCallback(html);
 
+        let customPrograms = CUSTOM_PROGRAMS[settings.data.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         const start_button = document.getElementById("button_start");
@@ -49,26 +50,27 @@ export class StartPage extends ComponentElement {
         });
 
         const clone_button = document.getElementById("button_clone");
-        clone_button.addEventListener("click", function cloneProgram() {
+        clone_button.addEventListener("click", () => {
             const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
             let program = getProgram(selected_program_identifier);
             let clone = JSON.parse(JSON.stringify(program));
             clone.title += " (copy)";
-            if (!CUSTOM_PROGRAMS[SETTINGS.selectedBoardID]) {
-                CUSTOM_PROGRAMS[SETTINGS.selectedBoardID] = [];
+            if (!customPrograms) {
+                CUSTOM_PROGRAMS[settings.data.selectedBoardID] = [];
+                customPrograms = CUSTOM_PROGRAMS[settings.data.selectedBoardID];
             }
-            CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].push(clone);
+            customPrograms.push(clone);
             storePrograms();
-            let new_identifier = "c" + CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].indexOf(clone);
+            let new_identifier = "c" + customPrograms.indexOf(clone);
             this.updateStartPage(new_identifier);
         });
 
         const delete_button = document.getElementById("button_delete");
-        delete_button.addEventListener("click", function editProgram() {
+        delete_button.addEventListener("click", () => {
             const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
             // TODO: confirm
             const num = selected_program_identifier.substr(1);
-            CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].splice(num, 1);
+            customPrograms.splice(num, 1);
             storePrograms();
             this.updateStartPage('c0');
             // TODO: else cannot delete last program
@@ -79,13 +81,15 @@ export class StartPage extends ComponentElement {
     }
 
     updateStartPage(identifier) {
+        const customPrograms = CUSTOM_PROGRAMS[settings.data.selectedBoardID];
+        const defaultPrograms = DEFAULT_PROGRAMS[settings.data.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         let selected_program_identifier = (typeof identifier !== 'undefined')
             ? identifier
             : program_select.options[program_select.selectedIndex]
                 ? program_select.options[program_select.selectedIndex].value
-                : (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID] && (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].length > 0))
+                : (customPrograms && (customPrograms.length > 0))
                     ? "c0"
                     : "d0";
 
@@ -96,11 +100,11 @@ export class StartPage extends ComponentElement {
 
         // Populate program select options
         let showDefaultProgramsExceptionally = false;
-        if (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID] && (CUSTOM_PROGRAMS[SETTINGS.selectedBoardID].length > 0)) {
+        if (customPrograms && (customPrograms.length > 0)) {
             const custom_optgroup = document.createElement('optgroup');
             custom_optgroup.setAttribute('label', 'Your programs'.toUpperCase());
-            for (let program_num in CUSTOM_PROGRAMS[SETTINGS.selectedBoardID]) {
-                const program = CUSTOM_PROGRAMS[SETTINGS.selectedBoardID][program_num];
+            for (let program_num in customPrograms) {
+                const program = customPrograms[program_num];
                 const opt = document.createElement('option');
                 const value = 'c' + program_num;
                 opt.setAttribute('value', value);
@@ -113,14 +117,14 @@ export class StartPage extends ComponentElement {
             }
             program_select.appendChild(custom_optgroup);
         }
-        else if (!SETTINGS.showDefaultPrograms) {
+        else if (!settings.data.showDefaultPrograms) {
             showDefaultProgramsExceptionally = true;
         }
-        if (SETTINGS.showDefaultPrograms || showDefaultProgramsExceptionally) {
+        if (settings.data.showDefaultPrograms || showDefaultProgramsExceptionally) {
             const default_optgroup = document.createElement('optgroup');
             default_optgroup.setAttribute('label', 'Built-in programs'.toUpperCase());
-            for (let program_num in DEFAULT_PROGRAMS[SETTINGS.selectedBoardID]) {
-                const program = DEFAULT_PROGRAMS[SETTINGS.selectedBoardID][program_num];
+            for (let program_num in defaultPrograms) {
+                const program = defaultPrograms[program_num];
                 const opt = document.createElement('option');
                 const value = 'd' + program_num;
                 opt.setAttribute('value', value);
@@ -156,7 +160,7 @@ export class StartPage extends ComponentElement {
 
         function showProgramDetails() {
             const program = getProgram(program_select.options[program_select.selectedIndex].value);
-            const board = BOARDS[SETTINGS.selectedBoardID];
+            const board = BOARDS[settings.data.selectedBoardID];
 
             const program_details_header = document.getElementById("program_details_header");
             while (program_details_header.firstChild) {
