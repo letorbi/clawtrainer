@@ -24,9 +24,19 @@ import {ComponentElement} from "../lib/component.js";
 
 import {BOARDS} from "../boards.js";
 import {getProgram} from "../programs.js";
-import {SETTINGS} from "../settings.js";
-import {ticSound, goSound, completedSound} from "../sounds.js";
-import {speak} from "../speech.js";
+import {SETTINGS, settings} from "../settings.js";
+import {play as _play} from "../sounds.js";
+import {speak as _speak} from "../speech.js";
+
+function play(sound) {
+    if (settings.data.soundOutput)
+        _play(sound);
+}
+
+function speak(message) {
+    if (settings.data.speechOutput)
+        _speak(message, settings.data.voice);
+}
 
 const COUNTER = (function () {
     var count, timer, paused, resolve, reject, steps, interval, cb;
@@ -76,7 +86,6 @@ const COUNTER = (function () {
         }
     };
 })();
-
 
 export class RunPage extends ComponentElement {
     async connectedCallback() {
@@ -162,7 +171,7 @@ export class RunPage extends ComponentElement {
                         speak(makePauseString(exercise.pause - step, true));
                     }
                     if (exercise.pause - step <= 5) { // letzte fünf Sekunden der Pause ticken
-                        ticSound();
+                        play("tic");
                     }
                 }
             );
@@ -196,7 +205,7 @@ export class RunPage extends ComponentElement {
                 document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
 
                 if (!SETTINGS.speechOutput) {
-                    goSound();
+                    play("go");
                 }
                 speak("Go!");
                 await COUNTER.start(
@@ -207,7 +216,7 @@ export class RunPage extends ComponentElement {
                         hold_pbar.value = step + 1;
                     }
                 );
-                completedSound();
+                play("completed");
 
                 if (rep < exercise.repeat - 1) { // bei letzter Wiederholung keine rest-Pause
                     await COUNTER.start(
@@ -218,7 +227,7 @@ export class RunPage extends ComponentElement {
                             rest_pbar.value = step + 1;
 
                             if (exercise.rest - step <= 3) {
-                                ticSound();
+                                play("tic");
                             }
                         }
                     );

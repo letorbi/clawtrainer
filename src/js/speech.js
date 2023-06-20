@@ -19,24 +19,21 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
-import {settings} from './settings.js';
-
-export async function speak(message, force = false) {
-    if ((settings.data.speechOutput || force) && settings.data.voice) {
-        console.info(`Speaking "${message}"`);
+export async function speak(message, voiceURI) {
+    const voices = await getVoices();
+    const [voice] = voices.filter(v => v.voiceURI === voiceURI);
+    if (voice !== undefined)
         await TextToSpeech.speak({
             text: message,
-            lang: 'en-US',
+            lang: voice.lang,
             rate: 1.0,
             pitch: 1.0,
             volume: 1.0,
-            voice: getSelectedVoice(),
-            category: 'ambient',
+            voice: voice,
+            category: "ambient"
         });
-    }
-    else {
-        console.warn(`Not speaking: "${message}"`);
-    }
+    else
+        console.warn(`no voice to speak: "${message}"`);
 }
 
 let _voices = null;
@@ -54,7 +51,6 @@ export async function getVoices() {
                   }
                   return 0;
             });
-            console.log(`voices found: ${voices}`);
             _voices = voices;
         }
         catch (e) {
@@ -63,18 +59,4 @@ export async function getVoices() {
         }
     }
     return _voices;
-}
-
-export async function getSelectedVoice() {
-    const voices = await getVoices();
-    const [selected_voice] = voices.filter(v => v.voiceURI === settings.data.voice);
-
-    if (selected_voice === undefined) {
-        console.warn('Invalid voice. Selecting first system voice if available.');
-        if (voices[0] !== undefined) {
-            settings.data.voice = voices[0].voiceURI;
-        }
-    }
-
-    return selected_voice;
 }

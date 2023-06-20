@@ -19,7 +19,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import {ComponentElement} from "../lib/component.js";
 
-import {settings, SETTINGS} from "../settings.js";
+import {settings} from "../settings.js";
 import {getVoices, speak} from "../speech.js";
 
 export class SettingsPage extends ComponentElement {
@@ -32,7 +32,7 @@ export class SettingsPage extends ComponentElement {
         for (let i in voices) {
             const opt = document.createElement('option');
             opt.setAttribute('value', i);
-            if (SETTINGS.voice === voices[i].voiceURI) {
+            if (settings.data.voice === voices[i].voiceURI) {
                 opt.defaultSelected = true;
             }
             const content = document.createTextNode(`${voices[i].name} (${voices[i].lang})`);
@@ -40,7 +40,7 @@ export class SettingsPage extends ComponentElement {
             voice_select.appendChild(opt);
         }
         settings.addObserver(this, 'voice', function () {
-            speak("Claw Trainer: Strong fingers for strong climbing", true);
+            speak("Claw Trainer: Strong fingers for strong climbing", settings.data.voice);
         }, false);
         voice_select.addEventListener("change", () => {
             // There is no easy way to prevent the default behaviour, so we just live with it.
