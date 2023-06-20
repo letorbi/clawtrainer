@@ -24,7 +24,7 @@ import {ComponentElement} from "../lib/component.js";
 
 import {BOARDS} from "../boards.js";
 import {getProgram} from "../programs.js";
-import {SETTINGS, settings} from "../settings.js";
+import {settings} from "../settings.js";
 import {play as _play} from "../sounds.js";
 import {speak as _speak} from "../speech.js";
 
@@ -99,7 +99,7 @@ export class RunPage extends ComponentElement {
         const program = getProgram(identifier);
         try {
             KeepAwake.keepAwake();
-            await this.runProgram(BOARDS[SETTINGS.selectedBoardID], program);
+            await this.runProgram(BOARDS[settings.data.selectedBoardID], program);
             history.back();
         }
         catch (err) {
@@ -204,7 +204,7 @@ export class RunPage extends ComponentElement {
 
                 document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
 
-                if (!SETTINGS.speechOutput) {
+                if (!settings.data.speechOutput) {
                     play("go");
                 }
                 speak("Go!");

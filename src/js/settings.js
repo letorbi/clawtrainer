@@ -47,6 +47,3 @@ class Settings extends Model {
 }
 
 export var settings = new Settings();
-
-// Obsolete. Should be avoided.
-export var SETTINGS = settings.data;

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {SETTINGS} from "./settings.js";
+import { settings } from "./settings.js";
 
 export const DEFAULT_PROGRAMS = {
     "version": 3,
@@ -616,10 +616,10 @@ export function getProgram(identifier) {
     const num = identifier.substr(1);
     let program;
     if (type == 'c') {
-        program = CUSTOM_PROGRAMS[SETTINGS.selectedBoardID][num];
+        program = CUSTOM_PROGRAMS[settings.data.selectedBoardID][num];
     }
     else if (type == 'd') {
-        program = DEFAULT_PROGRAMS[SETTINGS.selectedBoardID][num];
+        program = DEFAULT_PROGRAMS[settings.data.selectedBoardID][num];
     }
     return program;
 }
