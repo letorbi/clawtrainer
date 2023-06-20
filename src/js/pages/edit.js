@@ -19,13 +19,18 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { ComponentElement } from '../lib/component.js';
 
-import {getProgram, storePrograms} from "../programs.js";
-import {SETTINGS} from "../settings.js";
-import {BOARDS} from "../boards.js";
+import { getProgram, storePrograms } from "../programs.js";
+import { settings } from "../settings.js";
+import { BOARDS } from "../boards.js";
 
 export class EditPage extends ComponentElement {
     connectedCallback() {
         super.connectedCallback(html);
+        this.updateEditPage();
+    }
+
+    updateEditPage() {
+        const selectedBoard = BOARDS[settings.data.selectedBoardID];
 
         const identifier = location.hash.split('/')[2];
         const program = getProgram(identifier);
@@ -55,7 +60,7 @@ export class EditPage extends ComponentElement {
         });
 
         const button_add = fragment.querySelector('button[name=add_exercise]');
-        button_add.addEventListener("click", async () => {
+        button_add.addEventListener("click", () => {
             program.exercises.splice(0, 0, {
                 "title":        "",
                 "description":  "",
@@ -67,7 +72,7 @@ export class EditPage extends ComponentElement {
                 "pause":        60,
             });
             storePrograms();
-            this.updateEditPage(identifier);
+            this.updateEditPage();
         });
 
         edit_content.insertBefore(fragment, placeholder);
@@ -117,39 +122,39 @@ export class EditPage extends ComponentElement {
             const img_left = fragment.querySelector('img.overlay_left');
             const img_right = fragment.querySelector('img.overlay_right');
 
-            img_board.src = "./images/" + BOARDS[SETTINGS.selectedBoardID].image;
+            img_board.src = "./images/" + selectedBoard.image;
 
             const left = fragment.getElementById('edit_exercise_left');
             left.id += "_" + exercise_num;
-            for (let hold_id in BOARDS[SETTINGS.selectedBoardID].left_holds) {
+            for (let hold_id in selectedBoard.left_holds) {
                 const opt = document.createElement('option');
                 opt.setAttribute('value', hold_id);
-                const content = document.createTextNode(BOARDS[SETTINGS.selectedBoardID].left_holds[hold_id].name);
+                const content = document.createTextNode(selectedBoard.left_holds[hold_id].name);
                 opt.appendChild(content);
                 left.appendChild(opt);
             }
             left.value = exercise.left;
-            img_left.src = BOARDS[SETTINGS.selectedBoardID].left_holds[exercise.left].image ? "./images/" + BOARDS[SETTINGS.selectedBoardID].left_holds[exercise.left].image : "";
+            img_left.src = selectedBoard.left_holds[exercise.left].image ? "./images/" + selectedBoard.left_holds[exercise.left].image : "";
             left.addEventListener('change', function changeExerciseLeft() {
                 program.exercises[exercise_num].left = parseInt(this.value, 10);
-                img_left.src = "./images/" + BOARDS[SETTINGS.selectedBoardID].left_holds[this.value].image;
+                img_left.src = "./images/" + selectedBoard.left_holds[this.value].image;
                 storePrograms();
             });
 
             const right = fragment.getElementById('edit_exercise_right');
             right.id += "_" + exercise_num;
-            for (let hold_id in BOARDS[SETTINGS.selectedBoardID].right_holds) {
+            for (let hold_id in selectedBoard.right_holds) {
                 const opt = document.createElement('option');
                 opt.setAttribute('value', hold_id);
-                const content = document.createTextNode(BOARDS[SETTINGS.selectedBoardID].right_holds[hold_id].name);
+                const content = document.createTextNode(selectedBoard.right_holds[hold_id].name);
                 opt.appendChild(content);
                 right.appendChild(opt);
             }
             right.value = exercise.right;
-            img_right.src = BOARDS[SETTINGS.selectedBoardID].right_holds[exercise.right].image ? "./images/" + BOARDS[SETTINGS.selectedBoardID].right_holds[exercise.right].image : "";
+            img_right.src = selectedBoard.right_holds[exercise.right].image ? "./images/" + selectedBoard.right_holds[exercise.right].image : "";
             right.addEventListener('change', function changeExerciseRight() {
                 program.exercises[exercise_num].right = parseInt(this.value, 10);
-                img_right.src = "./images/" + BOARDS[SETTINGS.selectedBoardID].right_holds[this.value].image;
+                img_right.src = "./images/" + selectedBoard.right_holds[this.value].image;
                 storePrograms();
             });
 
@@ -187,7 +192,7 @@ export class EditPage extends ComponentElement {
             });
 
             const button_add = fragment.querySelector('button[name=add_exercise]');
-            button_add.addEventListener("click", async function addExercise() {
+            button_add.addEventListener("click", () => {
                 program.exercises.splice(Number(exercise_num) + 1, 0, {
                     "title":        "",
                     "description":  "",
@@ -199,14 +204,14 @@ export class EditPage extends ComponentElement {
                     "pause":        60,
                 });
                 storePrograms();
-                this.updateEditPage(identifier);
+                this.updateEditPage();
             });
 
             const button_delete = fragment.querySelector('button[name=delete_exercise]');
-            button_delete.addEventListener("click", async function deleteExercise() {
+            button_delete.addEventListener("click", () => {
                 program.exercises.splice(exercise_num, 1);
                 storePrograms();
-                this.updateEditPage(identifier);
+                this.updateEditPage();
             });
 
             form.appendChild(fragment);
