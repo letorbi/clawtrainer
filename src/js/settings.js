@@ -17,33 +17,13 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {Model} from "./lib/model.js";
-import {getVoices} from "./speech.js";
+import {Observable} from "./lib/observable.js";
 
-class Settings extends Model {
-    constructor() {
-        super({
-            version: 4,
-            selectedBoardID: "bm1000",
-            showDefaultPrograms: true,
-            soundOutput: true,
-            speechOutput: true,
-            voice: undefined
-        }, "settings");
-    }
-
-    async load() {
-        super.load();
-        const voices = await getVoices();
-        const [selected_voice] = voices.filter(v => v.voiceURI === settings.data.voice);
-
-        if (selected_voice === undefined) {
-            console.warn('Invalid voice. Selecting first system voice if available.');
-            if (voices[0] !== undefined) {
-                settings.data.voice = voices[0].voiceURI;
-            }
-        }
-    }
-}
-
-export var settings = new Settings();
+export var settings = new Observable({
+    version: 4,
+    selectedBoardID: "bm1000",
+    showDefaultPrograms: true,
+    soundOutput: true,
+    speechOutput: true,
+    voice: undefined
+});

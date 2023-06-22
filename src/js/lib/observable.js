@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-export class Model {
-    constructor(init, name) {
+export class Observable {
+    constructor(init) {
         this.observers = Object.create(null);
-        this.name = name;
         this.data = new Proxy(init, {
             set: (target, key, value) => {
                 target[key] = value;
@@ -56,18 +55,5 @@ export class Model {
 
         if (runImmediately)
             eventListener();
-    }
-
-    save() {
-        if (!this.name)
-            throw new Error("model has no name");
-        window.localStorage.setItem(this.name, JSON.stringify(this.data));
-    }
-
-    load() {
-        if (!this.name)
-            throw new Error("model has no name");
-        const data = JSON.parse(window.localStorage.getItem(this.name));
-        Object.assign(this.data, data);
     }
 }

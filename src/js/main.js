@@ -22,6 +22,7 @@ import { App } from '@capacitor/app';
 
 import { loadPrograms } from './programs.js';
 import { settings } from './settings.js';
+import { getVoices } from './speech.js';
 
 import { StartPage } from './pages/start.js';
 import { EditPage } from './pages/edit.js';
@@ -37,24 +38,35 @@ customElements.define('page-boards', BoardsPage);
 customElements.define('page-settings', SettingsPage);
 customElements.define('page-about', AboutPage);
 
-async function init() {
-    try {
-        await StatusBar.hide();
-    }
-    catch (e) {
-        console.warn(e.message);
-    }
-
-    settings.load();
-    loadPrograms();
-
-    App.addListener('resume', () => {
-        settings.load();
-    });
-
-    App.addListener('pause', () => {
-        settings.save();
-    });
+function saveSettings() {
+    const json = JSON.stringify(settings.data);
+    console.log(`saving: ${json}`);
+    localStorage.setItem("settings", json);
 }
 
-init();
+async function loadSettings() {
+    const json = localStorage.getItem("settings");
+    console.log(`loading: ${json}`);
+    Object.assign(settings.data, JSON.parse(json));
+
+    const voices = await getVoices();
+    const [voice] = voices.filter(v => v.voiceURI === settings.data.voice);
+    if (voice === undefined) {
+        console.warn('Invalid voice. Selecting first system voice, if available.');
+        settings.data.voice = voices[0]?.voiceURI;
+    }
+}
+
+window.addEventListener('load', async () => {
+    await loadSettings();
+    loadPrograms();
+    StatusBar.hide(); // async, but we don't care
+});
+
+App.addListener('resume', async () => {
+    await loadSettings();
+});
+
+App.addListener('pause', () => {
+    saveSettings();
+});
