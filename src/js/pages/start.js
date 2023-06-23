@@ -34,7 +34,7 @@ export class StartPage extends ComponentElement {
     connectedCallback() {
         super.connectedCallback(html);
 
-        let customPrograms = CUSTOM_PROGRAMS[settings.data.selectedBoardID];
+        let customPrograms = CUSTOM_PROGRAMS[settings.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         const start_button = document.getElementById("button_start");
@@ -56,8 +56,8 @@ export class StartPage extends ComponentElement {
             let clone = JSON.parse(JSON.stringify(program));
             clone.title += " (copy)";
             if (!customPrograms) {
-                CUSTOM_PROGRAMS[settings.data.selectedBoardID] = [];
-                customPrograms = CUSTOM_PROGRAMS[settings.data.selectedBoardID];
+                CUSTOM_PROGRAMS[settings.selectedBoardID] = [];
+                customPrograms = CUSTOM_PROGRAMS[settings.selectedBoardID];
             }
             customPrograms.push(clone);
             storePrograms();
@@ -81,8 +81,8 @@ export class StartPage extends ComponentElement {
     }
 
     updateStartPage(identifier) {
-        const customPrograms = CUSTOM_PROGRAMS[settings.data.selectedBoardID];
-        const defaultPrograms = DEFAULT_PROGRAMS[settings.data.selectedBoardID];
+        const customPrograms = CUSTOM_PROGRAMS[settings.selectedBoardID];
+        const defaultPrograms = DEFAULT_PROGRAMS[settings.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         let selected_program_identifier = (typeof identifier !== 'undefined')
@@ -117,10 +117,10 @@ export class StartPage extends ComponentElement {
             }
             program_select.appendChild(custom_optgroup);
         }
-        else if (!settings.data.showDefaultPrograms) {
+        else if (!settings.showDefaultPrograms) {
             showDefaultProgramsExceptionally = true;
         }
-        if (settings.data.showDefaultPrograms || showDefaultProgramsExceptionally) {
+        if (settings.showDefaultPrograms || showDefaultProgramsExceptionally) {
             const default_optgroup = document.createElement('optgroup');
             default_optgroup.setAttribute('label', 'Built-in programs'.toUpperCase());
             for (let program_num in defaultPrograms) {
@@ -160,7 +160,7 @@ export class StartPage extends ComponentElement {
 
         function showProgramDetails() {
             const program = getProgram(program_select.options[program_select.selectedIndex].value);
-            const board = BOARDS[settings.data.selectedBoardID];
+            const board = BOARDS[settings.selectedBoardID];
 
             const program_details_header = document.getElementById("program_details_header");
             while (program_details_header.firstChild) {

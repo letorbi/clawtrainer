@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {Observable} from "./lib/observable.js";
+import {makeObservable} from "./lib/observable.js";
 
-export var settings = new Observable({
+export var settings = makeObservable({
     version: 4,
     selectedBoardID: "bm1000",
     showDefaultPrograms: true,

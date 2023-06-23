@@ -31,7 +31,7 @@ export class BoardsPage extends ComponentElement {
             const div = document.createElement('div');
             div.setAttribute('class', 'hangboard_option');
             div.setAttribute('id', 'hangboard_' + bid);
-            div.addEventListener("click", () => settings.data.selectedBoardID = bid);
+            div.addEventListener("click", () => settings.selectedBoardID = bid);
             const label = document.createElement('label');
             label.setAttribute('for', 'radio_' + bid);
             const span = document.createElement('span');

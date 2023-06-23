@@ -30,7 +30,7 @@ export class EditPage extends ComponentElement {
     }
 
     updateEditPage() {
-        const selectedBoard = BOARDS[settings.data.selectedBoardID];
+        const selectedBoard = BOARDS[settings.selectedBoardID];
 
         const identifier = location.hash.split('/')[2];
         const program = getProgram(identifier);

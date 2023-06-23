@@ -29,13 +29,13 @@ import {play as _play} from "../sounds.js";
 import {speak as _speak} from "../speech.js";
 
 function play(sound) {
-    if (settings.data.soundOutput)
+    if (settings.soundOutput)
         _play(sound);
 }
 
 function speak(message) {
-    if (settings.data.speechOutput)
-        _speak(message, settings.data.voice);
+    if (settings.speechOutput)
+        _speak(message, settings.voice);
 }
 
 const COUNTER = (function () {
@@ -99,7 +99,7 @@ export class RunPage extends ComponentElement {
         const program = getProgram(identifier);
         try {
             KeepAwake.keepAwake();
-            await this.runProgram(BOARDS[settings.data.selectedBoardID], program);
+            await this.runProgram(BOARDS[settings.selectedBoardID], program);
             history.back();
         }
         catch (err) {
@@ -204,7 +204,7 @@ export class RunPage extends ComponentElement {
 
                 document.getElementById("repeat_counter").textContent = Number(rep) + 1 + "/" + exercise.repeat;
 
-                if (!settings.data.speechOutput) {
+                if (!settings.speechOutput) {
                     play("go");
                 }
                 speak("Go!");

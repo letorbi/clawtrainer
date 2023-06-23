@@ -39,7 +39,7 @@ customElements.define('page-settings', SettingsPage);
 customElements.define('page-about', AboutPage);
 
 function saveSettings() {
-    const json = JSON.stringify(settings.data);
+    const json = JSON.stringify(settings);
     console.log(`saving: ${json}`);
     localStorage.setItem("settings", json);
 }
@@ -47,13 +47,13 @@ function saveSettings() {
 async function loadSettings() {
     const json = localStorage.getItem("settings");
     console.log(`loading: ${json}`);
-    Object.assign(settings.data, JSON.parse(json));
+    Object.assign(settings, JSON.parse(json));
 
     const voices = await getVoices();
-    const [voice] = voices.filter(v => v.voiceURI === settings.data.voice);
+    const [voice] = voices.filter(v => v.voiceURI === settings.voice);
     if (voice === undefined) {
         console.warn('Invalid voice. Selecting first system voice, if available.');
-        settings.data.voice = voices[0]?.voiceURI;
+        settings.voice = voices[0]?.voiceURI;
     }
 }
 
