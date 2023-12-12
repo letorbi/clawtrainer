@@ -19,7 +19,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { makeObservable } from "./lib/observable.js";
 
-import { settings } from "./settings.js";
+import { SETTINGS } from "./settings.js";
 
 export const PROGRAMS = makeObservable({
     custom: {},
@@ -618,7 +618,7 @@ export function cloneProgram(identifier) {
     let clone = JSON.parse(JSON.stringify(getProgram(identifier)));
     clone.title += " (copy)";
     const customPrograms = PROGRAMS.custom; 
-    customPrograms[settings.selectedBoardID] = (customPrograms[settings.selectedBoardID] || []).concat([clone]);
+    customPrograms[SETTINGS.selectedBoardID] = (customPrograms[SETTINGS.selectedBoardID] || []).concat([clone]);
     PROGRAMS.custom = customPrograms;
     // TODO return if of cloned program
 }
@@ -626,7 +626,7 @@ export function cloneProgram(identifier) {
 export function deleteProgram(identifier) {
     const index = identifier.substr(1);
     const customPrograms = PROGRAMS.custom;
-    customPrograms[settings.selectedBoardID] = customPrograms[settings.selectedBoardID].filter((_, i) =>
+    customPrograms[SETTINGS.selectedBoardID] = customPrograms[SETTINGS.selectedBoardID].filter((_, i) =>
         i != index
     );
     PROGRAMS.custom = customPrograms;
@@ -638,10 +638,10 @@ export function getProgram(identifier) {
     const num = identifier.substr(1);
     let program;
     if (type == 'c') {
-        program = PROGRAMS.custom[settings.selectedBoardID][num];
+        program = PROGRAMS.custom[SETTINGS.selectedBoardID][num];
     }
     else if (type == 'd') {
-        program = PROGRAMS.default[settings.selectedBoardID][num];
+        program = PROGRAMS.default[SETTINGS.selectedBoardID][num];
     }
     return program;
 }

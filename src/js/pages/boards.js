@@ -20,7 +20,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import { ComponentElement } from '../lib/component.js';
 
 import {BOARDS} from "../boards.js";
-import {settings} from "../settings.js";
+import {SETTINGS} from "../settings.js";
 
 export class BoardsPage extends ComponentElement {
     connectedCallback() {
@@ -31,7 +31,7 @@ export class BoardsPage extends ComponentElement {
             const div = document.createElement('div');
             div.setAttribute('class', 'hangboard_option');
             div.setAttribute('id', 'hangboard_' + bid);
-            div.addEventListener("click", () => settings.selectedBoardID = bid);
+            div.addEventListener("click", () => SETTINGS.selectedBoardID = bid);
             const label = document.createElement('label');
             label.setAttribute('for', 'radio_' + bid);
             const span = document.createElement('span');
@@ -47,7 +47,7 @@ export class BoardsPage extends ComponentElement {
             hs.appendChild(div);
         }
 
-        settings.addObserver(this, "selectedBoardID", (bid) => {
+        SETTINGS.addObserver(this, "selectedBoardID", (bid) => {
             this.querySelectorAll('div.hangboard_option')
                 .forEach((elmt) => elmt.classList.remove("checked"));
             document.getElementById(`hangboard_${bid}`).classList.add("checked");

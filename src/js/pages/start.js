@@ -23,7 +23,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import {ComponentElement} from "../lib/component.js";
 
 import {PROGRAMS, getProgram, cloneProgram, deleteProgram} from "../programs.js";
-import {settings} from "../settings.js";
+import {SETTINGS} from "../settings.js";
 import {BOARDS} from "../boards.js";
 
 function navigateTo(page) {
@@ -67,8 +67,8 @@ export class StartPage extends ComponentElement {
     }
 
     updateStartPage(identifier) {
-        const customPrograms = PROGRAMS.custom[settings.selectedBoardID];
-        const defaultPrograms = PROGRAMS.default[settings.selectedBoardID];
+        const customPrograms = PROGRAMS.custom[SETTINGS.selectedBoardID];
+        const defaultPrograms = PROGRAMS.default[SETTINGS.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         let selected_program_identifier = (typeof identifier !== 'undefined')
@@ -103,10 +103,10 @@ export class StartPage extends ComponentElement {
             }
             program_select.appendChild(custom_optgroup);
         }
-        else if (!settings.showDefaultPrograms) {
+        else if (!SETTINGS.showDefaultPrograms) {
             showDefaultProgramsExceptionally = true;
         }
-        if (settings.showDefaultPrograms || showDefaultProgramsExceptionally) {
+        if (SETTINGS.showDefaultPrograms || showDefaultProgramsExceptionally) {
             const default_optgroup = document.createElement('optgroup');
             default_optgroup.setAttribute('label', 'Built-in programs'.toUpperCase());
             for (let program_num in defaultPrograms) {
@@ -146,7 +146,7 @@ export class StartPage extends ComponentElement {
 
         function showProgramDetails() {
             const program = getProgram(program_select.options[program_select.selectedIndex].value);
-            const board = BOARDS[settings.selectedBoardID];
+            const board = BOARDS[SETTINGS.selectedBoardID];
 
             const program_details_header = document.getElementById("program_details_header");
             while (program_details_header.firstChild) {
@@ -310,7 +310,7 @@ const html = `
                     <ion-label>Import Custom Programs</ion-label>
                 </ion-item>
                 <ion-item href="#/settings">
-                    <ion-icon name="settings-outline" slot="start"></ion-icon> 
+                    <ion-icon name="settings-outline" slot="start"></ion-icon>
                     <ion-label>Settings</ion-label>
                 </ion-item>
                 <ion-item href="#/about">

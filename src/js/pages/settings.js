@@ -19,7 +19,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import {ComponentElement} from "../lib/component.js";
 
-import {settings} from "../settings.js";
+import {SETTINGS} from "../settings.js";
 import {getVoices, speak} from "../speech.js";
 
 export class SettingsPage extends ComponentElement {
@@ -32,47 +32,47 @@ export class SettingsPage extends ComponentElement {
         for (let i in voices) {
             const opt = document.createElement('option');
             opt.setAttribute('value', i);
-            if (settings.voice === voices[i].voiceURI) {
+            if (SETTINGS.voice === voices[i].voiceURI) {
                 opt.defaultSelected = true;
             }
             const content = document.createTextNode(`${voices[i].name} (${voices[i].lang})`);
             opt.appendChild(content);
             voice_select.appendChild(opt);
         }
-        settings.addObserver(this, 'voice', function () {
-            speak("Claw Trainer: Strong fingers for strong climbing", settings.voice);
+        SETTINGS.addObserver(this, 'voice', function () {
+            speak("Claw Trainer: Strong fingers for strong climbing", SETTINGS.voice);
         }, false);
         voice_select.addEventListener("change", () => {
             // There is no easy way to prevent the default behaviour, so we just live with it.
             let v_num = voice_select.options[voice_select.selectedIndex].value;
-            settings.voice = voices[v_num].voiceURI;
+            SETTINGS.voice = voices[v_num].voiceURI;
         }, false);
 
         const checkbox_showDefaultPrograms = document.getElementById("checkbox_showDefaultPrograms");
-        settings.addObserver(this, 'showDefaultPrograms', function () {
-            checkbox_showDefaultPrograms.checked = settings.showDefaultPrograms;
+        SETTINGS.addObserver(this, 'showDefaultPrograms', function () {
+            checkbox_showDefaultPrograms.checked = SETTINGS.showDefaultPrograms;
         }, true);
         checkbox_showDefaultPrograms.addEventListener("click", (evt) => {
             evt.preventDefault();
-            settings.showDefaultPrograms = !settings.showDefaultPrograms;
+            SETTINGS.showDefaultPrograms = !SETTINGS.showDefaultPrograms;
         }, false);
 
         const checkbox_speechOutput = document.getElementById("checkbox_speechOutput");
-        settings.addObserver(this, 'speechOutput', function () {
-            checkbox_speechOutput.checked = settings.speechOutput;
+        SETTINGS.addObserver(this, 'speechOutput', function () {
+            checkbox_speechOutput.checked = SETTINGS.speechOutput;
         }, true);
         checkbox_speechOutput.addEventListener("click", (evt) => {
             evt.preventDefault();
-            settings.speechOutput = !settings.speechOutput;
+            SETTINGS.speechOutput = !SETTINGS.speechOutput;
         }, false);
 
         const checkbox_soundOutput = document.getElementById("checkbox_soundOutput");
-        settings.addObserver(this, 'soundOutput', function () {
-            checkbox_soundOutput.checked = settings.soundOutput;
+        SETTINGS.addObserver(this, 'soundOutput', function () {
+            checkbox_soundOutput.checked = SETTINGS.soundOutput;
         }, true);
         checkbox_soundOutput.addEventListener("click", (evt) => {
             evt.preventDefault();
-            settings.soundOutput = !settings.soundOutput;
+            SETTINGS.soundOutput = !SETTINGS.soundOutput;
         }, false);
     }
 }

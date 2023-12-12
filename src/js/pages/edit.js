@@ -20,7 +20,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import { ComponentElement } from '../lib/component.js';
 
 import { getProgram } from "../programs.js";
-import { settings } from "../settings.js";
+import { SETTINGS } from "../settings.js";
 import { BOARDS } from "../boards.js";
 
 export class EditPage extends ComponentElement {
@@ -30,7 +30,7 @@ export class EditPage extends ComponentElement {
     }
 
     updateEditPage() {
-        const selectedBoard = BOARDS[settings.selectedBoardID];
+        const selectedBoard = BOARDS[SETTINGS.selectedBoardID];
 
         const identifier = location.hash.split('/')[2];
         const program = getProgram(identifier);

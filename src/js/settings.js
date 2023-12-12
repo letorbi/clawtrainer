@@ -21,7 +21,7 @@ import {makeObservable} from "./lib/observable.js";
 
 import { getVoices } from './speech.js';
 
-export var settings = makeObservable({
+export const SETTINGS = makeObservable({
     version: 4,
     selectedBoardID: "bm1000",
     showDefaultPrograms: true,
@@ -31,20 +31,20 @@ export var settings = makeObservable({
 });
 
 export function saveSettings() {
-    const json = JSON.stringify(settings);
+    const json = JSON.stringify(SETTINGS);
     console.log(`saving: ${json}`);
-    localStorage.setItem("settings", json);
+    localStorage.setItem("SETTINGS", json);
 }
 
 export async function loadSettings() {
-    const json = localStorage.getItem("settings");
+    const json = localStorage.getItem("SETTINGS");
     console.log(`loading: ${json}`);
-    Object.assign(settings, JSON.parse(json));
+    Object.assign(SETTINGS, JSON.parse(json));
 
     const voices = await getVoices();
-    const [voice] = voices.filter(v => v.voiceURI === settings.voice);
+    const [voice] = voices.filter(v => v.voiceURI === SETTINGS.voice);
     if (voice === undefined) {
         console.warn('Invalid voice. Selecting first system voice, if available.');
-        settings.voice = voices[0]?.voiceURI;
+        SETTINGS.voice = voices[0]?.voiceURI;
     }
 }
