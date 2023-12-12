@@ -19,7 +19,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import { ComponentElement } from '../lib/component.js';
 
-import { getProgram, storePrograms } from "../programs.js";
+import { getProgram } from "../programs.js";
 import { settings } from "../settings.js";
 import { BOARDS } from "../boards.js";
 
@@ -49,14 +49,12 @@ export class EditPage extends ComponentElement {
         title.value = program.title;
         title.addEventListener('change', function changedProgramTitle() {
             program.title = this.value;
-            storePrograms();
         });
 
         const description = fragment.getElementById('edit_program_description');
         description.value = program.description;
         description.addEventListener('change', function changedProgramDescription() {
             program.description = this.value;
-            storePrograms();
         });
 
         const button_add = fragment.querySelector('button[name=add_exercise]');
@@ -71,7 +69,6 @@ export class EditPage extends ComponentElement {
                 "repeat":       5,
                 "pause":        60,
             });
-            storePrograms();
             this.updateEditPage();
         });
 
@@ -99,7 +96,6 @@ export class EditPage extends ComponentElement {
                     this.value = 15;
                 }
                 program.exercises[exercise_num].pause = Number(this.value);
-                storePrograms();
             });
 
             const title = fragment.getElementById('edit_exercise_title');
@@ -107,7 +103,6 @@ export class EditPage extends ComponentElement {
             title.id += "_" + exercise_num;
             title.addEventListener('change', function changeExerciseTitle() {
                 program.exercises[exercise_num].title = this.value;
-                storePrograms();
             });
 
             const description = fragment.getElementById('edit_exercise_description');
@@ -115,7 +110,6 @@ export class EditPage extends ComponentElement {
             description.id += "_" + exercise_num;
             description.addEventListener('change', function changeExerciseDescription() {
                 program.exercises[exercise_num].description = this.value;
-                storePrograms();
             });
 
             const img_board = fragment.querySelector('img.board_img');
@@ -138,7 +132,6 @@ export class EditPage extends ComponentElement {
             left.addEventListener('change', function changeExerciseLeft() {
                 program.exercises[exercise_num].left = parseInt(this.value, 10);
                 img_left.src = "./images/" + selectedBoard.left_holds[this.value].image;
-                storePrograms();
             });
 
             const right = fragment.getElementById('edit_exercise_right');
@@ -155,7 +148,6 @@ export class EditPage extends ComponentElement {
             right.addEventListener('change', function changeExerciseRight() {
                 program.exercises[exercise_num].right = parseInt(this.value, 10);
                 img_right.src = "./images/" + selectedBoard.right_holds[this.value].image;
-                storePrograms();
             });
 
             const hold = fragment.getElementById('edit_exercise_hold');
@@ -166,7 +158,6 @@ export class EditPage extends ComponentElement {
                     this.value = 1;
                 }
                 program.exercises[exercise_num].hold = Number(this.value);
-                storePrograms();
             });
 
             const interr = fragment.getElementById('edit_exercise_rest');
@@ -177,7 +168,6 @@ export class EditPage extends ComponentElement {
                     this.value = 1;
                 }
                 program.exercises[exercise_num].rest = Number(this.value);
-                storePrograms();
             });
 
             const repeat = fragment.getElementById('edit_exercise_repeat');
@@ -188,7 +178,6 @@ export class EditPage extends ComponentElement {
                     this.value = 1;
                 }
                 program.exercises[exercise_num].repeat = Number(this.value);
-                storePrograms();
             });
 
             const button_add = fragment.querySelector('button[name=add_exercise]');
@@ -203,14 +192,12 @@ export class EditPage extends ComponentElement {
                     "repeat":       5,
                     "pause":        60,
                 });
-                storePrograms();
                 this.updateEditPage();
             });
 
             const button_delete = fragment.querySelector('button[name=delete_exercise]');
             button_delete.addEventListener("click", () => {
                 program.exercises.splice(exercise_num, 1);
-                storePrograms();
                 this.updateEditPage();
             });
 

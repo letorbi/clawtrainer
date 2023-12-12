@@ -22,7 +22,7 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 import {ComponentElement} from "../lib/component.js";
 
-import {CUSTOM_PROGRAMS, DEFAULT_PROGRAMS, getProgram, storePrograms} from "../programs.js";
+import {PROGRAMS, getProgram, cloneProgram, deleteProgram} from "../programs.js";
 import {settings} from "../settings.js";
 import {BOARDS} from "../boards.js";
 
@@ -34,7 +34,6 @@ export class StartPage extends ComponentElement {
     connectedCallback() {
         super.connectedCallback(html);
 
-        let customPrograms = CUSTOM_PROGRAMS[settings.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         const start_button = document.getElementById("button_start");
@@ -51,38 +50,25 @@ export class StartPage extends ComponentElement {
 
         const clone_button = document.getElementById("button_clone");
         clone_button.addEventListener("click", () => {
-            const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
-            let program = getProgram(selected_program_identifier);
-            let clone = JSON.parse(JSON.stringify(program));
-            clone.title += " (copy)";
-            if (!customPrograms) {
-                CUSTOM_PROGRAMS[settings.selectedBoardID] = [];
-                customPrograms = CUSTOM_PROGRAMS[settings.selectedBoardID];
-            }
-            customPrograms.push(clone);
-            storePrograms();
-            let new_identifier = "c" + customPrograms.indexOf(clone);
-            this.updateStartPage(new_identifier);
+            cloneProgram(program_select.options[program_select.selectedIndex].value);
+            // TODO: select cloned program
         });
 
         const delete_button = document.getElementById("button_delete");
         delete_button.addEventListener("click", () => {
-            const selected_program_identifier = program_select.options[program_select.selectedIndex].value;
             // TODO: confirm
-            const num = selected_program_identifier.substr(1);
-            customPrograms.splice(num, 1);
-            storePrograms();
-            this.updateStartPage('c0');
+            deleteProgram(program_select.options[program_select.selectedIndex].value);
             // TODO: else cannot delete last program
-            // TODO: delete button disablen
+            // TODO: disable delete button
         });
 
+        PROGRAMS.addObserver(this, 'custom', this.updateStartPage.bind(this));
         this.updateStartPage();
     }
 
     updateStartPage(identifier) {
-        const customPrograms = CUSTOM_PROGRAMS[settings.selectedBoardID];
-        const defaultPrograms = DEFAULT_PROGRAMS[settings.selectedBoardID];
+        const customPrograms = PROGRAMS.custom[settings.selectedBoardID];
+        const defaultPrograms = PROGRAMS.default[settings.selectedBoardID];
         const program_select = document.getElementById("program_select");
 
         let selected_program_identifier = (typeof identifier !== 'undefined')
@@ -231,7 +217,7 @@ export class StartPage extends ComponentElement {
         try {
             await Filesystem.writeFile({
                 path: filename,
-                data: JSON.stringify(CUSTOM_PROGRAMS, null, "    "),
+                data: JSON.stringify(PROGRAMS.custom, null, "    "),
                 directory: Directory.ExternalStorage,
                 encoding: Encoding.UTF8,
             });
@@ -253,11 +239,11 @@ export class StartPage extends ComponentElement {
         const file = (await FilePicker.pickFiles({readData: true})).files[0];
         try {
             const ct = JSON.parse(atob(file.data));
-            if (ct.version == DEFAULT_PROGRAMS.version) {
-                if (countPrograms(CUSTOM_PROGRAMS) > 0) {
+            if (ct.version == PROGRAMS.default.version) {
+                if (countPrograms(PROGRAMS.custom) > 0) {
                     const { value } = await Dialog.confirm({
                         title: 'Import programs',
-                        message: `Do you want to overwrite your ${countPrograms(CUSTOM_PROGRAMS)} custom programs with ${countPrograms(ct)} programs from file '${file.name}'?`
+                        message: `Do you want to overwrite your ${countPrograms(PROGRAMS.custom)} custom programs with ${countPrograms(ct)} programs from file '${file.name}'?`
                     });
                     if (value) {
                         doImport(ct);
@@ -270,7 +256,7 @@ export class StartPage extends ComponentElement {
             else {
                 await Dialog.alert({
                     title: 'Import failed',
-                    message: `Version of imported programs (${ct.version}) does not match app version (${DEFAULT_PROGRAMS.version}).`
+                    message: `Version of imported programs (${ct.version}) does not match app version (${PROGRAMS.default.version}).`
                 });
             }
         }
@@ -283,11 +269,10 @@ export class StartPage extends ComponentElement {
         }
 
         function doImport(ct) {
-            for (const prop of Object.getOwnPropertyNames(CUSTOM_PROGRAMS))
-                delete CUSTOM_PROGRAMS[prop];
-            Object.assign(CUSTOM_PROGRAMS, ct);
+            for (const prop of Object.getOwnPropertyNames(PROGRAMS.custom))
+                delete PROGRAMS.custom[prop];
+            Object.assign(PROGRAMS.custom, ct);
             console.info(`Imported ${countPrograms(ct)} programs from file '${file.name}'`);
-            storePrograms();
             this.updateStartPage();
         }
 

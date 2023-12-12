@@ -20,9 +20,8 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 import { StatusBar } from "@capacitor/status-bar";
 import { App } from '@capacitor/app';
 
-import { loadPrograms } from './programs.js';
-import { settings } from './settings.js';
-import { getVoices } from './speech.js';
+import { loadPrograms, savePrograms } from './programs.js';
+import { loadSettings, saveSettings } from './settings.js';
 
 import { StartPage } from './pages/start.js';
 import { EditPage } from './pages/edit.js';
@@ -38,35 +37,18 @@ customElements.define('page-boards', BoardsPage);
 customElements.define('page-settings', SettingsPage);
 customElements.define('page-about', AboutPage);
 
-function saveSettings() {
-    const json = JSON.stringify(settings);
-    console.log(`saving: ${json}`);
-    localStorage.setItem("settings", json);
-}
-
-async function loadSettings() {
-    const json = localStorage.getItem("settings");
-    console.log(`loading: ${json}`);
-    Object.assign(settings, JSON.parse(json));
-
-    const voices = await getVoices();
-    const [voice] = voices.filter(v => v.voiceURI === settings.voice);
-    if (voice === undefined) {
-        console.warn('Invalid voice. Selecting first system voice, if available.');
-        settings.voice = voices[0]?.voiceURI;
-    }
-}
-
 window.addEventListener('load', async () => {
+    StatusBar.hide(); // async, but we don't care
     await loadSettings();
     loadPrograms();
-    StatusBar.hide(); // async, but we don't care
 });
 
 App.addListener('resume', async () => {
     await loadSettings();
+    loadPrograms();
 });
 
 App.addListener('pause', () => {
     saveSettings();
+    savePrograms();
 });

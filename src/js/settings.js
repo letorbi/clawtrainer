@@ -19,6 +19,8 @@ Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 
 import {makeObservable} from "./lib/observable.js";
 
+import { getVoices } from './speech.js';
+
 export var settings = makeObservable({
     version: 4,
     selectedBoardID: "bm1000",
@@ -27,3 +29,22 @@ export var settings = makeObservable({
     speechOutput: true,
     voice: undefined
 });
+
+export function saveSettings() {
+    const json = JSON.stringify(settings);
+    console.log(`saving: ${json}`);
+    localStorage.setItem("settings", json);
+}
+
+export async function loadSettings() {
+    const json = localStorage.getItem("settings");
+    console.log(`loading: ${json}`);
+    Object.assign(settings, JSON.parse(json));
+
+    const voices = await getVoices();
+    const [voice] = voices.filter(v => v.voiceURI === settings.voice);
+    if (voice === undefined) {
+        console.warn('Invalid voice. Selecting first system voice, if available.');
+        settings.voice = voices[0]?.voiceURI;
+    }
+}
