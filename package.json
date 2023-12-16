@@ -13,8 +13,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor-community/keep-awake": "^3.0.0",
-    "@capacitor-community/text-to-speech": "^2.1.0",
+    "@capacitor-community/keep-awake": "^4.0.0",
+    "@capacitor-community/text-to-speech": "^3.0.0",
     "@capacitor/android": "^5.0.0",
     "@capacitor/app": "^5.0.0",
     "@capacitor/core": "^5.0.0",
@@ -22,7 +22,7 @@
     "@capacitor/filesystem": "^5.0.0",
     "@capacitor/splash-screen": "^5.0.0",
     "@capacitor/status-bar": "^5.0.0",
-    "@capawesome/capacitor-file-picker": "^0.6.3",
+    "@capawesome/capacitor-file-picker": "^5.0.0",
     "@ionic/core": "^7.0.5",
     "hammerjs": "^2.0.8",
     "sound": "github:kittykatattack/sound.js",
