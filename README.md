@@ -36,7 +36,7 @@ While running the app in the browser is handy during development, it is not the 
 Once the app runs in the browser, you can use the following commands to create the Android app:
 
 ```
-npx capacitor-resources -t cover -p android
+npx capacitor-assets generate --android
 npm run build
 npx cap sync android
 npx cap open android

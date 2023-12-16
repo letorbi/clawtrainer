@@ -29,8 +29,8 @@
     "touch-menu-la": "github:letorbi/Touch-Menu-Like-Android"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.0",
     "@capacitor/cli": "^5.0.0",
-    "capacitor-resources": "^2.0.5",
     "vite": "^2.9.13"
   },
   "author": "",
