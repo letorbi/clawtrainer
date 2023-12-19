@@ -610,13 +610,21 @@ export function loadPrograms() {
         programs = { "version": PROGRAMS.default.version };
         console.info('No stored custom programs found.');
     }
-
     PROGRAMS.custom = programs;
+
+    // Make programs observable
+    for (const board in PROGRAMS.default)
+        if (Array.isArray(PROGRAMS.default[board]))
+            PROGRAMS.default[board] = PROGRAMS.default[board].map(p => makeObservable(p));
+    for (const board in PROGRAMS.custom)
+        if (Array.isArray(PROGRAMS.custom[board]))
+            PROGRAMS.custom[board] = PROGRAMS.custom[board].map(p => makeObservable(p));
 }
 
 export function cloneProgram(identifier) {
     let clone = JSON.parse(JSON.stringify(getProgram(identifier)));
     clone.title += " (copy)";
+    clone = makeObservable(clone);
     const customPrograms = PROGRAMS.custom; 
     customPrograms[SETTINGS.selectedBoardID] = (customPrograms[SETTINGS.selectedBoardID] || []).concat([clone]);
     PROGRAMS.custom = customPrograms;
