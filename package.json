@@ -13,25 +13,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor-community/keep-awake": "^4.0.0",
-    "@capacitor-community/text-to-speech": "^3.0.0",
-    "@capacitor/android": "^5.0.0",
-    "@capacitor/app": "^5.0.0",
-    "@capacitor/core": "^5.0.0",
-    "@capacitor/dialog": "^5.0.0",
-    "@capacitor/filesystem": "^5.0.0",
-    "@capacitor/splash-screen": "^5.0.0",
-    "@capacitor/status-bar": "^5.0.0",
-    "@capawesome/capacitor-file-picker": "^5.0.0",
-    "@ionic/core": "^7.0.5",
+    "@capacitor-community/keep-awake": "^5.0.0",
+    "@capacitor-community/text-to-speech": "^4.0.1",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/dialog": "^6.0.0",
+    "@capacitor/filesystem": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capawesome/capacitor-file-picker": "^6.0.0",
+    "@ionic/core": "^8.2.0",
     "hammerjs": "^2.0.8",
     "sound": "github:kittykatattack/sound.js",
     "touch-menu-la": "github:letorbi/Touch-Menu-Like-Android"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.0",
-    "@capacitor/cli": "^5.0.0",
-    "vite": "^2.9.13"
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.0.0",
+    "vite": "^5.2.12"
   },
   "author": "",
   "license": "ISC"
