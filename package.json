@@ -1,12 +1,10 @@
 {
-  "name": "capacitor-app",
-  "version": "1.0.0",
-  "description": "An Amazing Capacitor App",
-  "main": "index.js",
-  "keywords": [
-    "capacitor",
-    "mobile"
-  ],
+  "name": "clawtrainer",
+  "description": "A hangboard training app for Beastmaker and Griptonite boards.",
+  "keywords": ["climbing", "bouldering", "hangboard"],
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "author": "Torben Haase (https://letorbi.com)",
   "scripts": {
     "start": "vite",
     "build": "vite build",
@@ -32,7 +30,5 @@
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.0.0",
     "vite": "^5.2.12"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }
