@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
+export * from "vionic/components/";
+export * from "vionic/icons/";
+
 import { StatusBar } from "@capacitor/status-bar";
 import { App } from '@capacitor/app';
 

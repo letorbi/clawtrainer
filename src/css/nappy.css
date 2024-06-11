@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Claw Trainer. If not, see <https://www.gnu.org/licenses/>.
 */
 
-/*@import url('touch-menu-la/src/css/touch-menu-la.min.css');*/
+@import "vionic/styles.css";
 
 :root {
     --primary: #9bcdff;
